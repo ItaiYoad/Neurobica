@@ -249,113 +249,55 @@ export default function Configuration() {
         <AlertTitle>Configuration Required</AlertTitle>
         <AlertDescription>
           To access real-time biometric data from wearable devices, you need to configure 
-          your NeuroBrave and/or NeurospeedOS credentials. These services enable Neurobica 
-          to adapt to your emotional state.
+          your NeurospeedOS API credentials. This service by NeuroBrave enables Neurobica 
+          to access and process your biometric data from connected sensors.
         </AlertDescription>
       </Alert>
       
-      <Tabs defaultValue="neurobrave">
+      <Tabs defaultValue="neurospeed">
         <TabsList className="mb-4">
-          <TabsTrigger value="neurobrave">NeuroBrave API</TabsTrigger>
-          <TabsTrigger value="neurospeed">NeurospeedOS</TabsTrigger>
+          <TabsTrigger value="neurospeed">NeurospeedOS Configuration</TabsTrigger>
+          <TabsTrigger value="hiasettings">HIA Device Settings</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="neurobrave">
+        <TabsContent value="hiasettings">
           <Card>
             <CardHeader>
-              <CardTitle>NeuroBrave API Configuration</CardTitle>
+              <CardTitle>HIA Device Settings</CardTitle>
               <CardDescription>
-                Enter your NeuroBrave customer credentials to access biometric data 
-                through the NeuroBrave API.
+                HIA (Human Interface Adapter) scans your system for supported biometric sensors, 
+                authenticates them, and streams raw sensor data to NeurospeedOS Cloud API.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Form {...neuroBraveForm}>
-                <form onSubmit={neuroBraveForm.handleSubmit(onSubmitNeuroBrave)} className="space-y-4">
-                  <FormField
-                    control={neuroBraveForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="customer@example.com" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Your NeuroBrave customer account email
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={neuroBraveForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Your NeuroBrave customer account password
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={neuroBraveForm.control}
-                    name="verboseSocketLog"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">Verbose Logging</FormLabel>
-                          <FormDescription>
-                            Enable detailed WebSocket logging for debugging
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="flex items-center gap-4 pt-4">
-                    <Button type="submit" disabled={neuroBraveForm.formState.isSubmitting}>
-                      Save Configuration
-                    </Button>
-                    <Button 
-                      type="button" 
-                      variant="secondary" 
-                      onClick={testNeuroBraveConnection}
-                      disabled={testStatus.neuroBrave === 'testing'}
-                    >
-                      {testStatus.neuroBrave === 'testing' ? 'Testing...' : 'Test Connection'}
-                    </Button>
-                    
-                    {testStatus.neuroBrave === 'success' && (
-                      <div className="text-green-500 flex items-center gap-1">
-                        <CheckCircleIcon className="h-4 w-4" />
-                        <span>Connection successful</span>
-                      </div>
-                    )}
-                    
-                    {testStatus.neuroBrave === 'error' && (
-                      <div className="text-red-500 flex items-center gap-1">
-                        <AlertCircleIcon className="h-4 w-4" />
-                        <span>Connection failed</span>
-                      </div>
-                    )}
-                  </div>
-                </form>
-              </Form>
+              <div className="space-y-6">
+                <div className="rounded-lg border p-4">
+                  <h3 className="text-lg font-medium mb-2">Setting Up HIA Software</h3>
+                  <ol className="list-decimal ml-6 space-y-2">
+                    <li>Download HIA software from NeuroBrave dashboard</li>
+                    <li>Run HIA_setup.exe and follow installation wizard</li>
+                    <li>Input your NeurospeedOS user credentials when prompted</li>
+                    <li>Connect your biometric sensors (Muse headband, Apple Watch, etc.)</li>
+                    <li>Verify connection status in the HIA dashboard</li>
+                  </ol>
+                </div>
+                
+                <div className="rounded-lg border p-4">
+                  <h3 className="text-lg font-medium mb-2">Supported Biometric Sensors</h3>
+                  <ul className="list-disc ml-6 space-y-1">
+                    <li>Muse EEG Headband (all models)</li>
+                    <li>Apple Watch (Series 3 and newer)</li>
+                    <li>Fitbit (Sense, Versa 3+)</li>
+                    <li>Polar H10 Heart Rate Monitor</li>
+                    <li>Empatica E4 Wristband</li>
+                  </ul>
+                </div>
+                
+                <div className="rounded-lg border p-4 bg-muted/50">
+                  <h3 className="text-lg font-medium mb-2">More Information</h3>
+                  <p>For detailed instructions on setting up specific sensors or troubleshooting connection issues, please visit the <a href="https://neurospeed.io/docs" target="_blank" rel="noopener noreferrer" className="text-primary underline">NeurospeedOS documentation</a>.</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -363,10 +305,11 @@ export default function Configuration() {
         <TabsContent value="neurospeed">
           <Card>
             <CardHeader>
-              <CardTitle>NeurospeedOS Configuration</CardTitle>
+              <CardTitle>NeurospeedOS API Credentials</CardTitle>
               <CardDescription>
-                Configure NeurospeedOS to access real-time biometric data from connected 
-                devices like Muse headband and Apple Watch.
+                Connect to NeuroBrave's NeurospeedOS cloud platform to process real-time 
+                biometric data from your wearable sensors. These credentials will allow 
+                Neurobica to receive and respond to your emotional state.
               </CardDescription>
             </CardHeader>
             <CardContent>
