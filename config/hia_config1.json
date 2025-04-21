@@ -1,7 +1,7 @@
 {
-  "account_id": "",
+  "accountId": "",
   "username": "",
-  "user_password": "",
-  "HIA_ID": "user_data_hia_test_1",
-  "Verbose_socket_log": "False"
+  "userPassword": "",
+  "hiaId": "user_data_hia_test_1",
+  "verboseSocketLog": false
 }

@@ -70,9 +70,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <span>System Logs</span>
             </a>
           </Link>
+          <Link href="/configuration">
+            <a className={`flex items-center px-3 py-2 text-sm rounded-md ${location === "/configuration" ? "bg-[#60A5FA] text-white" : "text-neutral-dark hover:bg-neutral-light"}`}>
+              <i className="fas fa-cog mr-3"></i>
+              <span>Biometric Configuration</span>
+            </a>
+          </Link>
           <Link href="/settings">
             <a className={`flex items-center px-3 py-2 text-sm rounded-md ${location === "/settings" ? "bg-[#60A5FA] text-white" : "text-neutral-dark hover:bg-neutral-light"}`}>
-              <i className="fas fa-cog mr-3"></i>
+              <i className="fas fa-sliders-h mr-3"></i>
               <span>Settings</span>
             </a>
           </Link>
