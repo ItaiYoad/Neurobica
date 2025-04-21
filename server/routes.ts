@@ -13,7 +13,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Create WebSocket server
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
-  setupWebSocketHandlers(wss);
+  // Setup WebSocket handlers with async initialization
+  await setupWebSocketHandlers(wss);
   
   // Chat endpoint
   app.post("/api/chat", async (req, res) => {
