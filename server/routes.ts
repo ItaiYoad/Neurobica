@@ -231,6 +231,208 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Configuration endpoints for NeuroBrave and NeurospeedOS
+  
+  // Get NeuroBrave config
+  app.get("/api/config/neurobrave", async (req, res) => {
+    try {
+      const { loadNeuroBraveConfig } = await import('./services/configLoader');
+      const config = await loadNeuroBraveConfig();
+      
+      if (config) {
+        // Don't send password for security
+        res.json({
+          email: config.email,
+          verboseSocketLog: config.verboseSocketLog
+        });
+      } else {
+        res.json({});
+      }
+    } catch (error) {
+      console.error("Error fetching NeuroBrave config:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Set NeuroBrave config
+  app.post("/api/config/neurobrave", async (req, res) => {
+    try {
+      const { email, password, verboseSocketLog } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+      
+      const { saveNeuroBraveConfig, NeuroBraveConfig } = await import('./services/configLoader');
+      const { initializeNeuroBraveApi } = await import('./services/neuroBraveApi');
+      
+      const config: NeuroBraveConfig = {
+        email,
+        password,
+        verboseSocketLog: verboseSocketLog || false
+      };
+      
+      // Save the configuration
+      const saved = await saveNeuroBraveConfig(config);
+      
+      if (saved) {
+        // Initialize the API with the new config
+        await initializeNeuroBraveApi(config);
+        
+        // Log the configuration update
+        await storage.createLog({
+          id: nanoid(),
+          type: "config",
+          message: "NeuroBrave configuration updated",
+          data: { email }
+        });
+        
+        res.json({ success: true });
+      } else {
+        res.status(500).json({ message: "Failed to save configuration" });
+      }
+    } catch (error) {
+      console.error("Error saving NeuroBrave config:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Test NeuroBrave connection
+  app.post("/api/config/neurobrave/test", async (req, res) => {
+    try {
+      const { loadNeuroBraveConfig } = await import('./services/configLoader');
+      const config = await loadNeuroBraveConfig();
+      
+      if (!config || !config.email || !config.password) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "NeuroBrave configuration is incomplete" 
+        });
+      }
+      
+      const { initializeNeuroBraveApi } = await import('./services/neuroBraveApi');
+      const neuroBraveApi = await initializeNeuroBraveApi(config);
+      
+      // If initialization was successful
+      if (neuroBraveApi) {
+        res.json({ success: true });
+      } else {
+        res.json({ 
+          success: false, 
+          message: "Failed to connect to NeuroBrave API. Check your credentials." 
+        });
+      }
+    } catch (error) {
+      console.error("Error testing NeuroBrave connection:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to test NeuroBrave connection" 
+      });
+    }
+  });
+  
+  // Get NeurospeedOS config
+  app.get("/api/config/neurospeed", async (req, res) => {
+    try {
+      const { loadNeurospeedConfig } = await import('./services/configLoader');
+      const config = await loadNeurospeedConfig();
+      
+      if (config) {
+        // Don't send password for security
+        res.json({
+          accountId: config.accountId,
+          username: config.username,
+          hiaId: config.hiaId,
+          verboseSocketLog: config.verboseSocketLog
+        });
+      } else {
+        res.json({});
+      }
+    } catch (error) {
+      console.error("Error fetching NeurospeedOS config:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Set NeurospeedOS config
+  app.post("/api/config/neurospeed", async (req, res) => {
+    try {
+      const { accountId, username, userPassword, hiaId, verboseSocketLog } = req.body;
+      
+      if (!accountId || !username || !userPassword || !hiaId) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+      
+      const { saveNeurospeedConfig, NeurospeedConfig } = await import('./services/configLoader');
+      const { initializeNeurospeedOS } = await import('./services/neurospeedOS');
+      
+      const config: NeurospeedConfig = {
+        accountId,
+        username,
+        userPassword,
+        hiaId,
+        verboseSocketLog: verboseSocketLog || false
+      };
+      
+      // Save the configuration
+      const saved = await saveNeurospeedConfig(config);
+      
+      if (saved) {
+        // Initialize the API with the new config
+        await initializeNeurospeedOS(config);
+        
+        // Log the configuration update
+        await storage.createLog({
+          id: nanoid(),
+          type: "config",
+          message: "NeurospeedOS configuration updated",
+          data: { username, accountId }
+        });
+        
+        res.json({ success: true });
+      } else {
+        res.status(500).json({ message: "Failed to save configuration" });
+      }
+    } catch (error) {
+      console.error("Error saving NeurospeedOS config:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Test NeurospeedOS connection
+  app.post("/api/config/neurospeed/test", async (req, res) => {
+    try {
+      const { loadNeurospeedConfig } = await import('./services/configLoader');
+      const config = await loadNeurospeedConfig();
+      
+      if (!config || !config.username || !config.userPassword || !config.hiaId) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "NeurospeedOS configuration is incomplete" 
+        });
+      }
+      
+      const { initializeNeurospeedOS } = await import('./services/neurospeedOS');
+      const neurospeedOS = await initializeNeurospeedOS(config);
+      
+      // If initialization was successful
+      if (neurospeedOS) {
+        res.json({ success: true });
+      } else {
+        res.json({ 
+          success: false, 
+          message: "Failed to connect to NeurospeedOS. Check your credentials." 
+        });
+      }
+    } catch (error) {
+      console.error("Error testing NeurospeedOS connection:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to test NeurospeedOS connection" 
+      });
+    }
+  });
+  
   // Biometric data simulation endpoint (for testing)
   app.post("/api/biometrics/simulate", async (req, res) => {
     try {
