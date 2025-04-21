@@ -94,16 +94,18 @@ export default function Configuration() {
       .catch(err => {
         console.error('Error loading NeurospeedOS config:', err);
       });
-  }, []);
+  }, [neuroBraveForm, neurospeedForm]);
 
   // Submit NeuroBrave config
   const onSubmitNeuroBrave = async (values: z.infer<typeof neuroBraveSchema>) => {
     try {
-      const response = await apiRequest(
-        'POST',
-        '/api/config/neurobrave',
-        values
-      );
+      const response = await fetch('/api/config/neurobrave', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(values)
+      });
 
       const data = await response.json();
       
@@ -132,11 +134,13 @@ export default function Configuration() {
   // Submit NeurospeedOS config
   const onSubmitNeurospeed = async (values: z.infer<typeof neurospeedSchema>) => {
     try {
-      const response = await apiRequest(
-        'POST',
-        '/api/config/neurospeed',
-        values
-      );
+      const response = await fetch('/api/config/neurospeed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(values)
+      });
 
       const data = await response.json();
       
@@ -166,10 +170,12 @@ export default function Configuration() {
   const testNeuroBraveConnection = async () => {
     setTestStatus(prev => ({ ...prev, neuroBrave: 'testing' }));
     try {
-      const response = await apiRequest(
-        'POST',
-        '/api/config/neurobrave/test'
-      );
+      const response = await fetch('/api/config/neurobrave/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
       const data = await response.json();
       
@@ -201,10 +207,12 @@ export default function Configuration() {
   const testNeurospeedConnection = async () => {
     setTestStatus(prev => ({ ...prev, neurospeed: 'testing' }));
     try {
-      const response = await apiRequest(
-        'POST',
-        '/api/config/neurospeed/test'
-      );
+      const response = await fetch('/api/config/neurospeed/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
       const data = await response.json();
       
