@@ -263,10 +263,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email and password are required" });
       }
       
-      const { saveNeuroBraveConfig, NeuroBraveConfig } = await import('./services/configLoader');
+      const { saveNeuroBraveConfig } = await import('./services/configLoader');
       const { initializeNeuroBraveApi } = await import('./services/neuroBraveApi');
       
-      const config: NeuroBraveConfig = {
+      const config = {
         email,
         password,
         verboseSocketLog: verboseSocketLog || false
@@ -363,10 +363,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "All fields are required" });
       }
       
-      const { saveNeurospeedConfig, NeurospeedConfig } = await import('./services/configLoader');
+      const { saveNeurospeedConfig } = await import('./services/configLoader');
       const { initializeNeurospeedOS } = await import('./services/neurospeedOS');
       
-      const config: NeurospeedConfig = {
+      const config = {
         accountId,
         username,
         userPassword,

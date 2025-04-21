@@ -6,11 +6,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BiometricsProvider } from "@/context/BiometricsContext";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
+import Configuration from "@/pages/Configuration";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/configuration" component={Configuration} />
       <Route component={NotFound} />
     </Switch>
   );
