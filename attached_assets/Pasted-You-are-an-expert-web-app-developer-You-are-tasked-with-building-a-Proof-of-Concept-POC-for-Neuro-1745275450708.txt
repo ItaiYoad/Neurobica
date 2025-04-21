@@ -1,0 +1,65 @@
+You are an expert web-app developer. You are tasked with building a Proof of Concept (POC) for Neurobica, an emotionally adaptive AI platform. The POC should demonstrate the technical feasibility of using real-time biometric signals to influence the behavior of an LLM-based conversational agent, and show early potential for an AI Life Scheduler that learns from natural, everyday conversation.
+
+✅ Objective (Core features):
+
+Build a lightweight, modular system that proves the following:
+
+Real-time biometric signal ingestion (e.g., HRV, EEG) via Neurobrave NeurospeedOS API
+
+Basic emotion classification based on streamed data (stress, workload, focus, engagement, etc.) via Neurobrave Neurospeed OS API
+
+Dynamic prompt injection into the LLM context based on detected states (e.g., [Emotion: Stressed])
+
+Noticable changes in chatbot response style depending on user state
+
+Basic feasibility of a Life Scheduler, using natural-language cues to store and recall personal information
+
+Emotion-triggered notification system to close the feedback loop for the LLM and reinforce behavior shaping or user support
+
+⚙️ Scope:
+
+A React TypeScript web frontend with a basic chat interface integrated with GPT-4 (via OpenAI API)
+
+Real-time biometric streaming from two sources (e.g., Apple Watch + Muse), using NeurospeedOS API
+
+A simple threshold-based classifier for core states (e.g., Calm vs Stressed), derived from mental state signals
+
+Contextual LLM prompt injection based on emotion tags
+
+A system logging service to capture all system communications betwen clients and server (all interactions and state changes that the client sends and the system goes through)
+
+Emotion-triggered notification system with 3 types: 1. feedback loop (e.g., “I see you're stressed now” with true/ false buttons and continuous feedback loop with different questions until user answers true for LLM feedback loop) 2. context based (e.g., “Let’s pause for a breath” or “Need a quick walk?”) 3. conversation based (e.g., “I see you're stressed, let's talk!") (driven by detected states)
+
+A Minimal AI Life Scheduler:
+
+System listens for simple lifestyle statements like:“Remind me to drink water every morning”“My wallet is usually in the kitchen”
+
+Stores this in a lightweight memory (MongoDB)
+
+On next startup or relevant interaction, the system surfaces this data contextually (e.g., “Remember, your wallet is usually in the kitchen” or “Time to hydrate!)”
+
+🛠️ Technical Requirements:
+
+Frontend: React (TypeScript)
+
+Backend: Python (FastAPI)
+
+Database: MongoDB (to store logs, memories, and state history)
+
+APIs: OpenAI API (LLM), Neurobrave NeurospeedOS API (biometric data)
+
+System Logs: Log all client-server communications and key events (e.g., emotion tag changes, prompt shifts, memory triggers, messages sent by client with timestamp and biometric data within said timestamp)
+
+Simulated biometric data acceptable for development/testing
+
+✅ Success Criteria:
+
+The chatbot’s tone clearly adapts based on current emotional tags (e.g., calm vs stressed)
+
+The Life Scheduler can extract, store, and recall 2–3 personalized life facts/reminders during chat or session resumption
+
+Emotion-triggered notifications appear at contextually relevant moments, closing the loop
+
+All events (biometric input, emotion classification, LLM prompt adjustment, notifications) are accurately logged and reviewable
+
+This POC is a functional proof, not a production-ready product. Focus on proving that LLM behavior can adapt to real-time biometrics and retain conversationally extracted life context.
