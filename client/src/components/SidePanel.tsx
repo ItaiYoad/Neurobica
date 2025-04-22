@@ -12,13 +12,13 @@ export function SidePanel() {
   const { logs, viewAllLogs } = useSystemLogs();
 
   return (
-    <div className="w-80 border-l border-gray-200 bg-white hidden lg:block h-[calc(100vh-4rem)]">
+    <div className="w-80 border-l border-gray-200 bg-white hidden lg:block min-h-0">
       <ScrollArea className="h-full">
         <div className="p-4 border-b border-gray-200">
         <h2 className="font-semibold">Biometric Data</h2>
         <div className="mt-3">
           <BiometricChart data={biometricData} />
-          
+
           <div className="mt-3 flex space-x-2">
             <div className="flex-1 bg-white border border-gray-200 rounded-lg p-2 text-center">
               <div className="text-xs text-neutral-mid">Heart Rate</div>
@@ -35,9 +35,9 @@ export function SidePanel() {
           </div>
         </div>
       </div>
-      
+
       <LifeScheduler memoryItems={memoryItems} onAddMemoryItem={addMemoryItem} />
-      
+
       <SystemLogs logs={logs} onViewAllLogs={viewAllLogs} />
       </ScrollArea>
     </div>

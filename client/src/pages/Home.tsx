@@ -6,19 +6,19 @@ import { useState } from "react";
 
 export default function Home() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  
+
   const toggleMobileSidebar = () => {
     setMobileSidebarOpen(!mobileSidebarOpen);
   };
 
   return (
-    <div className="font-sans bg-neutral-lighter text-neutral-dark h-screen flex flex-col">
+    <div className="font-sans bg-neutral-lighter text-neutral-dark min-h-screen flex flex-col">
       <Header toggleSidebar={toggleMobileSidebar} />
-      
+
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
-        
-        <main className="flex-1 flex flex-col overflow-hidden">
+
+        <main className="flex-1 flex overflow-hidden">
           <div className="flex-1 flex">
             <ChatInterface toggleSidebar={toggleMobileSidebar} />
             <SidePanel />
