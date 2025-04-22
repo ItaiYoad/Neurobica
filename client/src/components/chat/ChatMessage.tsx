@@ -21,7 +21,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         <div className="flex mb-2">
           <div className="mr-2 flex-shrink-0">
             <img 
-              src="@assets/Chat assistant logo.png" 
+              src="/attached_assets/Chat assistant logo.png" 
               alt="Assistant" 
               className="w-8 h-8 rounded-full"
             />
