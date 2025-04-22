@@ -71,15 +71,20 @@ export async function textToSpeech(
     const voice = options.voice || 'nova'; // Default voice
     const speed = options.speed || 1.0; // Default speed
     
+    // Use direct response method with arraybuffer format
     const response = await openai.audio.speech.create({
       model: 'tts-1',
       voice,
       input: text,
       speed,
+      response_format: 'mp3', // Explicitly request mp3 format
     });
     
-    // Convert API response to buffer
-    const buffer = await streamToBuffer(response.body);
+    // Get audio data as arrayBuffer
+    const arrayBuffer = await response.arrayBuffer();
+    
+    // Convert to Buffer
+    const buffer = Buffer.from(arrayBuffer);
     
     return {
       audio: buffer,
@@ -88,25 +93,5 @@ export async function textToSpeech(
   } catch (error: any) {
     console.error('Text-to-speech error:', error);
     throw new Error(`Failed to generate speech: ${error?.message || 'Unknown error'}`);
-  }
-}
-
-/**
- * Helper function to convert a stream to a buffer
- */
-async function streamToBuffer(stream: ReadableStream): Promise<Buffer> {
-  const chunks: Uint8Array[] = [];
-  const reader = stream.getReader();
-  
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-    }
-    
-    return Buffer.concat(chunks);
-  } finally {
-    reader.releaseLock();
   }
 }
