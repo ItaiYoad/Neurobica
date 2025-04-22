@@ -1,6 +1,6 @@
 import { BiometricSourceCard } from "./biometrics/BiometricSourceCard";
 import { EmotionStateCard } from "./biometrics/EmotionStateCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBiometrics } from "@/context/BiometricsContext";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         },
         body: JSON.stringify({ title: 'New Chat' })
       });
-      
+
       if (response.ok) {
         const newConversation = await response.json();
         setConversations(prev => [newConversation, ...prev]);
