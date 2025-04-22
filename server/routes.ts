@@ -154,6 +154,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get memory items
+  // Get conversations
+  app.get("/api/conversations", async (req, res) => {
+    try {
+      const conversations = await storage.getConversations();
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create conversation
+  app.post("/api/conversations", async (req, res) => {
+    try {
+      const { title } = req.body;
+      const conversation = await storage.createConversation(title || "New Chat");
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/memories", async (req, res) => {
     try {
       const memories = await storage.getAllMemories();

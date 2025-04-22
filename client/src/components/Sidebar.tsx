@@ -31,11 +31,35 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
   const { biometricSources, emotionalStates } = useBiometrics();
   const [minimized, setMinimized] = useState(false);
-  const [conversations, setConversations] = useState<ConversationItem[]>([
-    { id: "1", title: "Morning Planning Session", date: "Today" },
-    { id: "2", title: "Workout Goals", date: "Yesterday" },
-    { id: "3", title: "Meeting Preparation", date: "3 days ago" },
-  ]);
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
+
+  useEffect(() => {
+    // Fetch conversations on mount
+    fetch('/api/conversations')
+      .then(res => res.json())
+      .then(data => setConversations(data))
+      .catch(console.error);
+  }, []);
+
+  const handleNewChat = async () => {
+    try {
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title: 'New Chat' })
+      });
+      
+      if (response.ok) {
+        const newConversation = await response.json();
+        setConversations(prev => [newConversation, ...prev]);
+        // You can add navigation to the new chat here if needed
+      }
+    } catch (error) {
+      console.error('Error creating new chat:', error);
+    }
+  };
 
   const toggleMinimize = () => {
     setMinimized(!minimized);
@@ -89,14 +113,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       )}
 
       <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-between">
-        {!minimized && (
-          <div className="text-sm font-semibold text-primary">
-            Conversations
-          </div>
-        )}
         <div className="flex items-center">
           {!minimized && (
-            <Button variant="outline" size="sm" className="mr-2">
+            <Button variant="outline" size="sm" className="mr-2" onClick={handleNewChat}>
               <PlusCircle className="h-4 w-4 mr-1" />
               <span>New Chat</span>
             </Button>

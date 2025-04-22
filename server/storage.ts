@@ -196,3 +196,37 @@ export class MemStorage implements IStorage {
 
 // Create and export storage instance
 export const storage = new MemStorage();
+import { nanoid } from "nanoid";
+
+interface Conversation {
+  id: string;
+  title: string;
+  timestamp: number;
+}
+
+const conversations: Conversation[] = [];
+
+export const storage = {
+  // ... existing storage methods ...
+
+  createConversation: async (title: string) => {
+    const conversation = {
+      id: nanoid(),
+      title,
+      timestamp: Date.now()
+    };
+    conversations.push(conversation);
+    return conversation;
+  },
+
+  getConversations: async () => {
+    return conversations.sort((a, b) => b.timestamp - a.timestamp);
+  },
+
+  deleteConversation: async (id: string) => {
+    const index = conversations.findIndex(c => c.id === id);
+    if (index !== -1) {
+      conversations.splice(index, 1);
+    }
+  }
+};
