@@ -24,16 +24,24 @@ export function ChatMessage({ message }: ChatMessageProps) {
               <i className="fas fa-robot"></i>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-3 shadow-sm max-w-3xl">
+          <div className="bg-blue-50 rounded-lg p-3 shadow-sm max-w-3xl">
             <div className="text-sm space-y-2">
+              <p>{message.content}</p>
+              
               {message.emotionalContext && (
-                <div className="flex items-center text-xs text-status-alert mb-2">
+                <div className="flex items-center text-[11px] text-neutral-mid mt-2">
                   <i className="fas fa-heart-rate mr-1"></i>
-                  <span>{message.emotionalContext}</span>
+                  <span>
+                    {message.emotionalContext.includes("calm") ? (
+                      <>
+                        I'm currently detecting that you're in a <span className="text-blue-400">calm</span> state.
+                      </>
+                    ) : (
+                      message.emotionalContext
+                    )}
+                  </span>
                 </div>
               )}
-              
-              <p>{message.content}</p>
               
               {message.memoryTrigger && (
                 <div className={`p-2 ${
