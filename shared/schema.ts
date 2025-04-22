@@ -38,9 +38,30 @@ export const insertMemorySchema = createInsertSchema(memories).pick({
 export type InsertMemory = z.infer<typeof insertMemorySchema>;
 export type Memory = typeof memories.$inferSelect;
 
+// Conversations (chat history)
+export const conversations = pgTable("conversations", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  userId: integer("user_id").references(() => users.id),
+  summary: text("summary"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertConversationSchema = createInsertSchema(conversations).pick({
+  id: true,
+  title: true,
+  userId: true,
+  summary: true,
+});
+
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type Conversation = typeof conversations.$inferSelect;
+
 // Chat messages
 export const messages = pgTable("messages", {
   id: text("id").primaryKey(),
+  conversationId: text("conversation_id").references(() => conversations.id),
   role: text("role").notNull(),
   content: text("content").notNull(),
   emotionalContext: text("emotional_context"),
@@ -50,6 +71,7 @@ export const messages = pgTable("messages", {
 
 export const insertMessageSchema = createInsertSchema(messages).pick({
   id: true,
+  conversationId: true,
   role: true,
   content: true,
   emotionalContext: true,

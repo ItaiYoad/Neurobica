@@ -1,3 +1,4 @@
+import { ScrollArea } from "./ui/scroll-area";
 import { BiometricChart } from "./biometrics/BiometricChart";
 import { LifeScheduler } from "./scheduler/LifeScheduler";
 import { SystemLogs } from "./logs/SystemLogs";
@@ -11,8 +12,9 @@ export function SidePanel() {
   const { logs, viewAllLogs } = useSystemLogs();
 
   return (
-    <div className="w-80 border-l border-gray-200 bg-white hidden lg:block overflow-y-auto">
-      <div className="p-4 border-b border-gray-200">
+    <div className="w-80 border-l border-gray-200 bg-white hidden lg:block h-[calc(100vh-4rem)]">
+      <ScrollArea className="h-full">
+        <div className="p-4 border-b border-gray-200">
         <h2 className="font-semibold">Biometric Data</h2>
         <div className="mt-3">
           <BiometricChart data={biometricData} />
@@ -37,6 +39,7 @@ export function SidePanel() {
       <LifeScheduler memoryItems={memoryItems} onAddMemoryItem={addMemoryItem} />
       
       <SystemLogs logs={logs} onViewAllLogs={viewAllLogs} />
+      </ScrollArea>
     </div>
   );
 }
