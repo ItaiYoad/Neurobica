@@ -201,14 +201,42 @@ export class MemStorage implements IStorage {
     return this.conversations;
   }
 
-  async createConversation(title: string): Promise<any> {
+  async createConversation(title: string, initialPrompt?: string): Promise<any> {
     const conversation = {
       id: nanoid(),
       title,
-      createdAt: Date.now(),
+      timestamp: Date.now(),
+      emotionalStates: [],
+      isHighlighted: false,
+      folder: null,
+      messages: initialPrompt ? [{
+        id: nanoid(),
+        role: 'assistant',
+        content: initialPrompt,
+        timestamp: Date.now()
+      }] : []
     };
     this.conversations.unshift(conversation);
     return conversation;
+  }
+
+  async updateConversation(id: string, updates: Partial<any>): Promise<any> {
+    const index = this.conversations.findIndex(c => c.id === id);
+    if (index === -1) return null;
+    
+    this.conversations[index] = {
+      ...this.conversations[index],
+      ...updates
+    };
+    return this.conversations[index];
+  }
+
+  async deleteConversation(id: string): Promise<void> {
+    this.conversations = this.conversations.filter(c => c.id !== id);
+  }
+
+  async getConversation(id: string): Promise<any> {
+    return this.conversations.find(c => c.id === id);
   }
 }
 

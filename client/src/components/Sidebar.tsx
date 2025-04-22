@@ -24,8 +24,44 @@ interface SidebarProps {
 interface ConversationItem {
   id: string;
   title: string;
-  date: string;
+  timestamp: number;
+  emotionalStates?: {
+    type: string;
+    level: number;
+    label: string;
+    color: string;
+  }[];
+  isHighlighted?: boolean;
+  folder?: string;
 }
+
+interface ConversationType {
+  id: string;
+  title: string;
+  description: string;
+  initialPrompt: string;
+}
+
+const conversationTypes: ConversationType[] = [
+  {
+    id: 'general',
+    title: 'General Chat',
+    description: 'Open-ended conversation',
+    initialPrompt: ''
+  },
+  {
+    id: 'focus',
+    title: 'Focus Session',
+    description: 'Stay productive and track progress',
+    initialPrompt: "Let's have a focused session. What would you like to accomplish?"
+  },
+  {
+    id: 'reflection',
+    title: 'Daily Reflection',
+    description: 'Review and process your day',
+    initialPrompt: "I'm here to help you reflect. How was your day?"
+  }
+];
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
@@ -89,6 +125,45 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     );
   };
 
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [showNewChatDialog, setShowNewChatDialog] = useState(false);
+  const [folders, setFolders] = useState<string[]>([]);
+  
+  const handleSelectChat = (id: string) => {
+    setSelectedChat(id);
+    // Trigger chat loading in parent component
+    onSelectChat?.(id);
+  };
+
+  const handleNewChat = (type: ConversationType) => {
+    handleCreateChat(type.initialPrompt);
+    setShowNewChatDialog(false);
+  };
+
+  const handleDeleteChat = async (id: string) => {
+    try {
+      await fetch(`/api/conversations/${id}`, { method: 'DELETE' });
+      setConversations(prev => prev.filter(conv => conv.id !== id));
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+    }
+  };
+
+  const handleRenameChat = async (id: string, newTitle: string) => {
+    try {
+      await fetch(`/api/conversations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle })
+      });
+      setConversations(prev => prev.map(conv => 
+        conv.id === id ? { ...conv, title: newTitle } : conv
+      ));
+    } catch (error) {
+      console.error('Error renaming chat:', error);
+    }
+  };
+
   return (
     <aside
       className={`
@@ -140,19 +215,72 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex-grow overflow-y-auto p-2">
           <div className="space-y-1">
             {conversations.map((conversation) => (
-              <Button
+              <div
                 key={conversation.id}
-                variant="ghost"
-                className="w-full justify-start font-normal py-2 px-3 h-auto text-left"
+                className={`group relative ${
+                  selectedChat === conversation.id ? 'bg-primary/10' : ''
+                } ${conversation.isHighlighted ? 'border-l-2 border-primary' : ''}`}
               >
-                <MessageSquare className="h-4 w-4 mr-2 flex-shrink-0" />
-                <div className="truncate">
-                  <div className="text-sm truncate">{conversation.title}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {conversation.date}
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start font-normal py-2 px-3 h-auto text-left"
+                  onClick={() => handleSelectChat(conversation.id)}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <div className="truncate flex-1">
+                    <div className="text-sm truncate">{conversation.title}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(conversation.timestamp).toLocaleDateString()}
+                    </div>
+                    {conversation.emotionalStates && (
+                      <div className="flex gap-1 mt-1">
+                        {conversation.emotionalStates.map((state, idx) => (
+                          <span
+                            key={idx}
+                            className={`w-2 h-2 rounded-full bg-status-${state.color}`}
+                            title={`${state.label} (${state.type})`}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
+                </Button>
+                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleRenameChat(conversation.id, "")}>
+                        Rename
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDeleteChat(conversation.id)}>
+                        Delete
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => {}}>
+                        Highlight
+                      </DropdownMenuItem>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>Move to folder</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          {folders.map(folder => (
+                            <DropdownMenuItem key={folder}>
+                              {folder}
+                            </DropdownMenuItem>
+                          ))}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            New folder
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-              </Button>
+              </div>
             ))}
           </div>
         </div>

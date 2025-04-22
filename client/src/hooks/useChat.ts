@@ -10,20 +10,33 @@ export function useChat() {
   const [isLoading, setIsLoading] = useState(false);
   const { currentEmotionalState, sendMessage: sendWebSocketMessage, lastMessage } = useBiometrics();
 
-  // Initialize with a welcome message
-  useEffect(() => {
-    const welcomeMessage: Message = {
-      id: nanoid(),
-      role: "assistant",
-      content: "Hello! I'm your Neurobica assistant. I can adapt to your emotional state and help organize your life. How are you feeling today?",
-      timestamp: Date.now(),
-      emotionalContext: currentEmotionalState ? 
-        `I'm currently detecting that you're in a ${currentEmotionalState.label.toLowerCase()} state.` : 
-        undefined
-    };
+  const [messageCount, setMessageCount] = useState(0);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
-    setMessages([welcomeMessage]);
-  }, []);
+  const loadConversation = async (id: string) => {
+    try {
+      const response = await fetch(`/api/conversations/${id}`);
+      const conversation = await response.json();
+      setMessages(conversation.messages || []);
+      setCurrentConversationId(id);
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+    }
+  };
+
+  // Auto-update conversation title after 2 messages
+  useEffect(() => {
+    if (messageCount === 2 && currentConversationId) {
+      const userMessages = messages.filter(m => m.role === 'user');
+      if (userMessages.length >= 2) {
+        fetch(`/api/conversations/${currentConversationId}/title`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: userMessages.slice(0, 2) })
+        });
+      }
+    }
+  }, [messageCount, currentConversationId]);
 
   // Listen for incoming websocket messages (notifications, etc.)
   useEffect(() => {
