@@ -1,5 +1,5 @@
 import { Message } from "@/types";
-
+import chatAssistantLogo from "@assets/Chat assistant logo.png";
 interface ChatMessageProps {
   message: Message;
 }
@@ -20,21 +20,26 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div className="mb-4">
         <div className="flex mb-2">
           <div className="mr-2 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
-              <i className="fas fa-robot"></i>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+              <img
+                src={chatAssistantLogo}
+                alt="Assistant"
+                className="w-6 h-6 object-contain"
+              />
             </div>
           </div>
           <div className="bg-blue-50 rounded-lg p-3 shadow-sm max-w-3xl">
             <div className="text-sm space-y-2">
               <p>{message.content}</p>
-              
+
               {message.emotionalContext && (
                 <div className="flex items-center text-[11px] text-neutral-mid mt-2">
                   <i className="fas fa-heart-rate mr-1"></i>
                   <span>
                     {message.emotionalContext.includes("calm") ? (
                       <>
-                        I'm currently detecting that you're in a <span className="text-blue-400">calm</span> state.
+                        I'm currently detecting that you're in a{" "}
+                        <span className="text-blue-400">calm</span> state.
                       </>
                     ) : (
                       message.emotionalContext
@@ -42,26 +47,32 @@ export function ChatMessage({ message }: ChatMessageProps) {
                   </span>
                 </div>
               )}
-              
+
               {message.memoryTrigger && (
-                <div className={`p-2 ${
-                  message.memoryTrigger.type === 'reminder' 
-                    ? 'bg-secondary-light bg-opacity-10 border border-secondary-light' 
-                    : 'bg-accent-light bg-opacity-10 border border-accent-light'
-                } rounded-md mt-2`}>
+                <div
+                  className={`p-2 ${
+                    message.memoryTrigger.type === "reminder"
+                      ? "bg-secondary-light bg-opacity-10 border border-secondary-light"
+                      : "bg-accent-light bg-opacity-10 border border-accent-light"
+                  } rounded-md mt-2`}
+                >
                   <div className="flex items-center">
-                    <i className={`${
-                      message.memoryTrigger.type === 'reminder' 
-                        ? 'fas fa-calendar-check text-secondary' 
-                        : 'fas fa-brain text-accent'
-                    } mr-2`}></i>
+                    <i
+                      className={`${
+                        message.memoryTrigger.type === "reminder"
+                          ? "fas fa-calendar-check text-secondary"
+                          : "fas fa-brain text-accent"
+                      } mr-2`}
+                    ></i>
                     <div className="text-sm">
                       <span className="font-medium">
-                        {message.memoryTrigger.type === 'reminder' 
-                          ? 'Added to Life Scheduler:' 
-                          : 'Added to memory:'}
+                        {message.memoryTrigger.type === "reminder"
+                          ? "Added to Life Scheduler:"
+                          : "Added to memory:"}
                       </span>
-                      <span className="ml-1 text-neutral-dark">{message.memoryTrigger.content}</span>
+                      <span className="ml-1 text-neutral-dark">
+                        {message.memoryTrigger.content}
+                      </span>
                     </div>
                   </div>
                 </div>
