@@ -12,7 +12,7 @@ export function SidePanel() {
   const { logs, viewAllLogs } = useSystemLogs();
 
   return (
-    <div className="w-80 border-l border-gray-200 bg-white hidden lg:block h-full">
+    <div className="w-80 border-l border-gray-200 bg-white hidden lg:block h-[calc(100vh-4rem)]">
       <ScrollArea className="h-full">
         <div className="p-4 border-b border-gray-200">
         <h2 className="font-semibold">Biometric Data</h2>
