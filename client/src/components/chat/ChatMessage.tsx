@@ -20,11 +20,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div className="mb-4">
         <div className="flex mb-2">
           <div className="mr-2 flex-shrink-0">
-            <img 
-              src="/attached_assets/Chat assistant logo.png" 
-              alt="Assistant" 
-              className="w-8 h-8 rounded-full"
-            />
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
+              <img 
+                src="/attached_assets/Chat assistant logo.png" 
+                alt="Assistant" 
+                className="w-6 h-6 object-contain"
+              />
+            </div>
           </div>
           <div className="bg-blue-50 rounded-lg p-3 shadow-sm max-w-3xl">
             <div className="text-sm space-y-2">
