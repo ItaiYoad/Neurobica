@@ -26,7 +26,11 @@ export function SystemLogs({ logs, onViewAllLogs }: SystemLogsProps) {
   // Format timestamp to readable time
   const formatTime = (timestamp: number): string => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   };
 
   return (
@@ -34,21 +38,25 @@ export function SystemLogs({ logs, onViewAllLogs }: SystemLogsProps) {
       <h2 className="font-semibold">Recent System Logs</h2>
       <div className="mt-3 space-y-2">
         {logs.length === 0 ? (
-          <div className="text-xs text-neutral-mid italic">No logs available</div>
+          <div className="text-xs text-neutral-mid italic">
+            No logs available
+          </div>
         ) : (
           logs.slice(0, 5).map((log) => (
-            <div 
-              key={log.id} 
+            <div
+              key={log.id}
               className={`text-xs border-l-2 ${getLogColor(log.type)} pl-2 py-1`}
             >
-              <div className="text-neutral-mid">{formatTime(log.timestamp)}</div>
+              <div className="text-neutral-mid">
+                {formatTime(log.timestamp)}
+              </div>
               <div className="font-medium">{log.message}</div>
             </div>
           ))
         )}
       </div>
-      
-      <button 
+
+      <button
         className="mt-3 text-xs text-primary hover:text-primary-dark"
         onClick={onViewAllLogs}
       >
