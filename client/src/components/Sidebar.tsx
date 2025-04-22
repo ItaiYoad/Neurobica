@@ -52,9 +52,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <aside 
       className={`
         relative flex flex-col
-        ${isOpen ? 'fixed z-50 top-0 left-0 h-full' : 'hidden'} 
+        ${isOpen ? 'fixed z-50 top-16 left-0 h-[calc(100vh-4rem)]' : 'hidden'} 
         ${minimized ? 'w-16' : 'w-64'} 
-        md:flex md:static md:z-auto 
+        md:flex md:static md:z-auto md:h-full
         bg-white border-r border-gray-200 transition-all duration-300
       `}
     >
