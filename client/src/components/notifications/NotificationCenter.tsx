@@ -93,7 +93,7 @@ export function NotificationCenter() {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[350px] sm:w-[400px] p-0">
+      <SheetContent side="right" className="w-[350px] sm:w-[400px] p-0" closeButton={false}>
         <SheetHeader className="p-4 border-b">
           <SheetTitle>Notifications</SheetTitle>
           <SheetDescription>
