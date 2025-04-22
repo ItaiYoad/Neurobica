@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Mic, Send, Paperclip, Loader2 } from "lucide-react";
+import { Mic, Send, MoreHorizontal, Loader2 } from "lucide-react";
 import AudioRecorder from "@/components/ui/audio-recorder";
 import { toast } from "@/hooks/use-toast";
 import { useAudio } from "@/context/AudioContext";
@@ -71,59 +71,61 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white p-4">
-      <form className="flex items-end space-x-2" onSubmit={handleSubmit}>
+    <div className="bg-white p-4">
+      <form className="flex items-end" onSubmit={handleSubmit}>
         <div className="flex-1 relative">
-          <textarea 
-            ref={textareaRef}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-20 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-            placeholder="Type your message..."
-            rows={1}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-          />
-          <div className="absolute bottom-2 right-2 flex space-x-1">
-            <button 
-              type="button" 
-              className="p-1.5 rounded-full hover:bg-neutral-100 text-gray-500 hover:text-gray-700"
-              onClick={() => toast({
-                title: "Attachment feature",
-                description: "File attachments will be available in a future update."
-              })}
-            >
-              <Paperclip className="h-5 w-5" />
-            </button>
-            
-            {settings.sttEnabled ? (
-              <AudioRecorder 
-                onTranscription={handleTranscription}
-                className="inline-flex" 
-              />
-            ) : (
+          <div className="w-full bg-white border border-blue-100 rounded-full shadow-sm">
+            <textarea 
+              ref={textareaRef}
+              className="w-full px-4 py-3 pr-32 focus:outline-none rounded-full resize-none overflow-hidden bg-transparent"
+              placeholder="Type your message..."
+              rows={1}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
               <button 
                 type="button"
-                onClick={handleMicClick}
-                className="p-1.5 rounded-full hover:bg-neutral-100 text-gray-500 hover:text-gray-700"
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
+                onClick={() => toast({
+                  title: "Menu",
+                  description: "Menu options will be available in a future update."
+                })}
               >
-                <Mic className="h-5 w-5" />
+                <MoreHorizontal className="h-5 w-5" />
               </button>
-            )}
+              
+              {settings.sttEnabled ? (
+                <AudioRecorder 
+                  onTranscription={handleTranscription}
+                  className="inline-flex" 
+                />
+              ) : (
+                <button 
+                  type="button"
+                  onClick={handleMicClick}
+                  className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
+                >
+                  <Mic className="h-5 w-5" />
+                </button>
+              )}
+              
+              <button 
+                type="submit" 
+                className={`p-2 border border-blue-100 rounded-full hover:bg-gray-50 ${isLoading || !message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isLoading || !message.trim()}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 text-blue-400 animate-spin" />
+                ) : (
+                  <Send className="h-5 w-5 text-blue-400" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
-        <button 
-          type="submit" 
-          className={`px-4 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg flex items-center ${isLoading || !message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={isLoading || !message.trim()}
-        >
-          {isLoading ? (
-            <Loader2 className="h-5 w-5 mr-1.5 animate-spin" />
-          ) : (
-            <Send className="h-5 w-5 mr-1.5" />
-          )}
-          <span>Send</span>
-        </button>
       </form>
     </div>
   );
