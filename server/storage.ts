@@ -37,6 +37,8 @@ export interface IStorage {
   // Biometric data methods
   createBiometricData(data: InsertBiometricData): Promise<BiometricData>;
   getLatestBiometricData(): Promise<BiometricData | undefined>;
+  getConversations(): Promise<any[]>; // Added conversation methods
+  createConversation(title: string): Promise<any>;
 }
 
 // In-memory storage implementation
@@ -46,6 +48,7 @@ export class MemStorage implements IStorage {
   private memories: Map<string, Memory>;
   private logs: Map<string, Log>;
   private biometricData: Map<string, BiometricData>;
+  private conversations: any[]; // Added conversations array
 
   currentUserId: number;
 
@@ -55,6 +58,7 @@ export class MemStorage implements IStorage {
     this.memories = new Map();
     this.logs = new Map();
     this.biometricData = new Map();
+    this.conversations = []; // Initialize conversations array
     this.currentUserId = 1;
   }
 
@@ -191,6 +195,20 @@ export class MemStorage implements IStorage {
   async getLatestBiometricData(): Promise<BiometricData | undefined> {
     return Array.from(this.biometricData.values())
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];
+  }
+
+  async getConversations(): Promise<any[]> {
+    return this.conversations;
+  }
+
+  async createConversation(title: string): Promise<any> {
+    const conversation = {
+      id: nanoid(),
+      title,
+      createdAt: Date.now(),
+    };
+    this.conversations.unshift(conversation);
+    return conversation;
   }
 }
 
