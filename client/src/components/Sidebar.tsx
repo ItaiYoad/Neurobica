@@ -122,9 +122,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Navigation section */}
       <div className="flex-none p-2 border-t border-gray-200">
         <nav className="space-y-1">
-          {renderNavLink("/", <MessageSquare className="h-4 w-4" />, "Chat")}
-          {renderNavLink("/dashboard", <BarChart3 className="h-4 w-4" />, "Dashboard")}
-          {renderNavLink("/scheduler", <Calendar className="h-4 w-4" />, "Scheduler")}
+          <Button variant="ghost" className="w-full justify-start" asChild>
+            <Link href="/">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Chat
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start" asChild>
+            <Link href="/dashboard">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Dashboard
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start" asChild>
+            <Link href="/scheduler">
+              <Calendar className="h-4 w-4 mr-2" />
+              Scheduler
+            </Link>
+          </Button>
           {renderNavLink("/logs", <List className="h-4 w-4" />, "Logs")}
           {renderNavLink("/configuration", <Cog className="h-4 w-4" />, "Configuration")}
           {renderNavLink("/settings", <Settings className="h-4 w-4" />, "Settings")}
