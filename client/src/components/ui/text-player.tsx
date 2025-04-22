@@ -22,13 +22,15 @@ export default function TextPlayer({
   const [isLoading, setIsLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  
+  const silentAudioRef = useRef<HTMLAudioElement | null>(null);
+
+
   // Effect for auto-play when the component mounts or text changes
   useEffect(() => {
     if (text && autoPlay && settings.ttsEnabled) {
       playAudio();
     }
-    
+
     // Clean up audio when component unmounts or text changes
     return () => {
       if (audioRef.current) {
@@ -38,31 +40,39 @@ export default function TextPlayer({
           setAudioUrl(null);
         }
       }
+      if (silentAudioRef.current) {
+        silentAudioRef.current.pause();
+      }
     };
   }, [text, autoPlay]);
-  
+
   // Stop playing when TTS is disabled globally
   useEffect(() => {
     if (!settings.ttsEnabled && isPlaying) {
       stopAudio();
     }
   }, [settings.ttsEnabled]);
-  
+
   const playAudio = async () => {
     // Don't do anything if TTS is disabled
     if (!settings.ttsEnabled) return;
-    
+
     // If we already have audio loaded, play it
     if (audioUrl && audioRef.current) {
       audioRef.current.play();
       setIsPlaying(true);
       return;
     }
-    
-    // Otherwise, fetch new audio
+
     setIsLoading(true);
-    
+
     try {
+      // Play silent audio to enable autoplay
+      const silentAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
+      silentAudioRef.current = silentAudio;
+      await silentAudio.play();
+      silentAudio.pause(); // Pause immediately after playing
+
       const response = await fetch('/api/audio/speech', {
         method: 'POST',
         headers: {
@@ -74,28 +84,21 @@ export default function TextPlayer({
           speed: settings.defaultSpeed
         })
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to generate speech');
       }
-      
-      // Get audio as blob
+
       const audioBlob = await response.blob();
-      
-      // Create object URL
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
-      
-      // Create audio element
+
       if (!audioRef.current) {
         audioRef.current = new Audio(url);
-        
-        // Add event listeners
         audioRef.current.addEventListener('ended', () => {
           setIsPlaying(false);
         });
-        
         audioRef.current.addEventListener('error', (e) => {
           console.error('Audio playback error:', e);
           toast({
@@ -108,8 +111,7 @@ export default function TextPlayer({
       } else {
         audioRef.current.src = url;
       }
-      
-      // Play audio
+
       await audioRef.current.play();
       setIsPlaying(true);
     } catch (error: any) {
@@ -123,7 +125,7 @@ export default function TextPlayer({
       setIsLoading(false);
     }
   };
-  
+
   const stopAudio = () => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -131,7 +133,7 @@ export default function TextPlayer({
       setIsPlaying(false);
     }
   };
-  
+
   const toggleAudio = () => {
     if (isPlaying) {
       stopAudio();
@@ -139,13 +141,11 @@ export default function TextPlayer({
       playAudio();
     }
   };
-  
-  // If TTS is disabled and not forced to show button, don't render anything
+
   if (!settings.ttsEnabled && !showButton) {
     return null;
   }
-  
-  // Otherwise render toggle button
+
   return (
     <span className={className}>
       {isLoading ? (
