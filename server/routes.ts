@@ -7,6 +7,14 @@ import { chatHandler } from "./services/openai";
 import WebSocket from "ws";
 import { extractMemoriesFromText } from "./services/biometrics";
 import { nanoid } from "nanoid";
+import multer from 'multer';
+import { speechToText, textToSpeech } from './services/openai-audio';
+
+// Configure multer for audio file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -505,5 +513,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Speech-to-Text endpoint
+  app.post("/api/audio/transcribe", upload.single('audio'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No audio file provided" });
+      }
+      
+      // Check if OpenAI API key is configured
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ 
+          success: false, 
+          message: "OpenAI API key not configured. Please set the OPENAI_API_KEY environment variable." 
+        });
+      }
+      
+      const audioBuffer = req.file.buffer;
+      const language = req.body.language;
+      const prompt = req.body.prompt;
+      
+      // Transcribe audio to text
+      const transcription = await speechToText(audioBuffer, `${nanoid()}.mp3`, { 
+        language, 
+        prompt 
+      });
+      
+      // Log successful transcription
+      await storage.createLog({
+        id: nanoid(),
+        type: "audio",
+        message: `Audio transcribed successfully (${Math.round(audioBuffer.length / 1024)} KB)`,
+        data: { 
+          transcription: transcription.substring(0, 100) + (transcription.length > 100 ? '...' : '') 
+        }
+      });
+      
+      res.json({ success: true, transcription });
+    } catch (error) {
+      console.error("Error transcribing audio:", error);
+      
+      // Log the error
+      await storage.createLog({
+        id: nanoid(),
+        type: "error",
+        message: `Audio transcription error: ${error.message || 'Unknown error'}`,
+        data: { error: error.message || 'Unknown error' }
+      });
+      
+      res.status(500).json({ 
+        success: false, 
+        message: `Failed to transcribe audio: ${error.message || 'Unknown error'}` 
+      });
+    }
+  });
+  
+  // Text-to-Speech endpoint
+  app.post("/api/audio/speech", async (req, res) => {
+    try {
+      const { text, voice, speed } = req.body;
+      
+      if (!text) {
+        return res.status(400).json({ message: "Text is required" });
+      }
+      
+      // Check if OpenAI API key is configured
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ 
+          success: false, 
+          message: "OpenAI API key not configured. Please set the OPENAI_API_KEY environment variable." 
+        });
+      }
+      
+      // Convert text to speech
+      const { audio, contentType } = await textToSpeech(text, { voice, speed });
+      
+      // Log successful TTS generation
+      await storage.createLog({
+        id: nanoid(),
+        type: "audio",
+        message: `Generated speech audio for text (${Math.round(text.length)} chars)`,
+        data: { text: text.substring(0, 100) + (text.length > 100 ? '...' : '') }
+      });
+      
+      // Set the appropriate content type and send the audio data
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', 'attachment; filename="speech.mp3"');
+      res.send(audio);
+    } catch (error) {
+      console.error("Error generating speech:", error);
+      
+      // Log the error
+      await storage.createLog({
+        id: nanoid(),
+        type: "error",
+        message: `Text-to-speech error: ${error.message || 'Unknown error'}`,
+        data: { error: error.message || 'Unknown error' }
+      });
+      
+      res.status(500).json({ 
+        success: false, 
+        message: `Failed to generate speech: ${error.message || 'Unknown error'}` 
+      });
+    }
+  });
+  
+  // Audio settings endpoint
+  app.get("/api/audio/settings", async (req, res) => {
+    try {
+      res.json({
+        ttsEnabled: true,
+        sttEnabled: true,
+        voiceOptions: [
+          { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced voice' },
+          { id: 'echo', name: 'Echo', description: 'Deeper, authoritative voice' },
+          { id: 'fable', name: 'Fable', description: 'Expressive, narrative-focused voice' },
+          { id: 'onyx', name: 'Onyx', description: 'Versatile, professional voice' },
+          { id: 'nova', name: 'Nova', description: 'Warm, natural voice' },
+          { id: 'shimmer', name: 'Shimmer', description: 'Clear, optimistic voice' }
+        ],
+        defaultVoice: 'nova',
+        speedOptions: [
+          { value: 0.8, label: 'Slow' },
+          { value: 1.0, label: 'Normal' },
+          { value: 1.2, label: 'Fast' }
+        ],
+        defaultSpeed: 1.0
+      });
+    } catch (error) {
+      console.error("Error fetching audio settings:", error);
+      res.status(500).json({ message: "Failed to fetch audio settings" });
+    }
+  });
+  
+  // Update audio settings endpoint
+  app.post("/api/audio/settings", async (req, res) => {
+    try {
+      const { ttsEnabled, sttEnabled, defaultVoice, defaultSpeed } = req.body;
+      
+      // Here you would normally save these settings to a database or config file
+      // For now, just acknowledge the update
+      
+      await storage.createLog({
+        id: nanoid(),
+        type: "config",
+        message: "Audio settings updated",
+        data: { ttsEnabled, sttEnabled, defaultVoice, defaultSpeed }
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating audio settings:", error);
+      res.status(500).json({ message: "Failed to update audio settings" });
+    }
+  });
+  
   return httpServer;
 }
