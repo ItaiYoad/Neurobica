@@ -1,10 +1,29 @@
 import { Message } from "@/types";
 import chatAssistantLogo from "@assets/Chat assistant logo.png";
+import TextPlayer from "@/components/ui/text-player";
+import { useAudio } from "@/context/AudioContext";
+import { useEffect, useState } from "react";
+
 interface ChatMessageProps {
   message: Message;
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
+  const { settings } = useAudio();
+  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
+  
+  // Add a slight delay before showing the text player for assistant messages
+  // This prevents TTS from starting while messages are still being added/animated
+  useEffect(() => {
+    if (message.role === "assistant" && settings.ttsEnabled) {
+      const timer = setTimeout(() => {
+        setShowAudioPlayer(true);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [message.role, settings.ttsEnabled]);
+  
   if (message.role === "user") {
     // User message
     return (
@@ -30,7 +49,16 @@ export function ChatMessage({ message }: ChatMessageProps) {
           </div>
           <div className="bg-blue-50 rounded-lg p-3 shadow-sm max-w-3xl">
             <div className="text-sm space-y-2">
-              <p>{message.content}</p>
+              <div className="flex items-start">
+                <p className="flex-1">{message.content}</p>
+                {showAudioPlayer && (
+                  <TextPlayer 
+                    text={message.content} 
+                    autoPlay={settings.ttsEnabled}
+                    className="ml-2 mt-1 flex-shrink-0"
+                  />
+                )}
+              </div>
 
               {message.emotionalContext && (
                 <div className="flex items-center text-[11px] text-neutral-mid mt-2">
