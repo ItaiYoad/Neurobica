@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon, CheckCircleIcon, AlertCircleIcon } from "lucide-react";
+import AudioSettingsTab from "@/components/settings/AudioSettings";
 import { apiRequest } from "@/lib/queryClient";
 
 const neuroBraveSchema = z.object({
@@ -258,6 +259,7 @@ export default function Configuration() {
         <TabsList className="mb-4">
           <TabsTrigger value="neurospeed">NeurospeedOS Configuration</TabsTrigger>
           <TabsTrigger value="hiasettings">HIA Device Settings</TabsTrigger>
+          <TabsTrigger value="audio">Voice & Audio Settings</TabsTrigger>
         </TabsList>
         
         <TabsContent value="hiasettings">
@@ -435,6 +437,10 @@ export default function Configuration() {
               </Form>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="audio">
+          <AudioSettingsTab />
         </TabsContent>
       </Tabs>
     </div>
