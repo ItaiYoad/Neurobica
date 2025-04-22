@@ -30,7 +30,7 @@ export function useChat() {
     if (lastMessage) {
       switch (lastMessage.type) {
         case "chat_message":
-          if (lastMessage.data.role === "assistant") {
+          if (lastMessage.data.role === "assistant" && !messages.some(msg => msg.content === lastMessage.data.content)) {
             setMessages(prev => [...prev, {
               id: nanoid(),
               role: lastMessage.data.role,

@@ -22,17 +22,11 @@ export function ChatMessages({ messages, notifications, isLoading }: ChatMessage
   const chatItems = [...messages, ...notifications].sort((a, b) => a.timestamp - b.timestamp);
 
   return (
-    <ScrollArea className="flex-1 bg-gray-50">
-      <div className="p-4">
-      {chatItems.map((item) => {
-        if ('role' in item) {
-          // This is a message
-          return <ChatMessage key={item.id} message={item} />;
-        } else {
-          // This is a notification
-          return <EmotionNotification key={item.id} notification={item} />;
-        }
-      })}
+    <ScrollArea className="flex-1 bg-gray-50 h-full">
+      <div className="p-4 min-h-full">
+      {messages.map((message) => (
+        <ChatMessage key={message.id} message={message} />
+      ))}
       
       {isLoading && (
         <div className="flex justify-center my-4">
