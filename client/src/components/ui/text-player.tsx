@@ -57,12 +57,20 @@ export default function TextPlayer({
     // Don't do anything if TTS is disabled
     if (!settings.ttsEnabled) return;
 
-    // If we already have audio loaded, play it
-    if (audioUrl && audioRef.current) {
-      audioRef.current.play();
-      setIsPlaying(true);
-      return;
-    }
+    try {
+      // Play a silent audio first to initialize audio context
+      if (!audioRef.current) {
+        const silent = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
+        await silent.play();
+        silent.pause();
+      }
+
+      // If we already have audio loaded, play it
+      if (audioUrl && audioRef.current) {
+        await audioRef.current.play();
+        setIsPlaying(true);
+        return;
+      }
 
     setIsLoading(true);
 
@@ -116,11 +124,14 @@ export default function TextPlayer({
       setIsPlaying(true);
     } catch (error: any) {
       console.error('Error generating speech:', error);
-      toast({
-        title: 'Text-to-speech failed',
-        description: error.message || 'Failed to convert text to speech',
-        variant: 'destructive'
-      });
+      // Only show toast for non-autoplay errors
+      if (!autoPlay) {
+        toast({
+          title: 'Text-to-speech failed',
+          description: error.message || 'Failed to convert text to speech',
+          variant: 'destructive'
+        });
+      }
     } finally {
       setIsLoading(false);
     }
