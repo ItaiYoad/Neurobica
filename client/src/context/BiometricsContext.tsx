@@ -8,6 +8,7 @@ interface BiometricsContextType {
   emotionalStates: EmotionalState[];
   currentEmotionalState: EmotionalState | undefined;
   connected: boolean;
+  connectionStatus: 'connected' | 'disconnected' | 'connecting';
   lastMessage: WebSocketMessage | null;
   sendMessage: (
     type: "biometric_update" | "chat_message" | "notification" | "log" | "memory" | "connection_status", 
@@ -19,6 +20,7 @@ const BiometricsContext = createContext<BiometricsContextType | undefined>(undef
 
 export function BiometricsProvider({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'connecting'>('connecting');
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
   const [socket, setSocket] = useState<WebSocket | null>(null);
   
@@ -33,6 +35,7 @@ export function BiometricsProvider({ children }: { children: ReactNode }) {
     ws.addEventListener("open", () => {
       console.log("WebSocket connection established");
       setConnected(true);
+      setConnectionStatus('connected');
     });
     
     // Listen for messages
@@ -50,12 +53,14 @@ export function BiometricsProvider({ children }: { children: ReactNode }) {
     ws.addEventListener("close", () => {
       console.log("WebSocket connection closed");
       setConnected(false);
+      setConnectionStatus('disconnected');
     });
     
     // Connection error
     ws.addEventListener("error", (error) => {
       console.error("WebSocket error:", error);
       setConnected(false);
+      setConnectionStatus('disconnected');
     });
     
     setSocket(ws);
@@ -159,11 +164,48 @@ export function BiometricsProvider({ children }: { children: ReactNode }) {
         
         setBiometricData(simulatedData.biometricData);
         setEmotionalStates(simulatedData.emotionalStates);
-      }, 5000);
+        
+        // Simulate a notification occasionally
+        if (Math.random() > 0.8) {
+          const emotionalState = simulatedData.emotionalStates.find(state => state.type === 'emotional');
+          const isStressed = emotionalState && emotionalState.level > 70;
+          
+          // Create a simulated notification message based on emotional state
+          const notificationData = {
+            id: `notification-${Date.now()}`,
+            type: isStressed ? "context_based" : "feedback_loop",
+            title: isStressed ? "High stress detected" : "Emotional state update",
+            message: isStressed 
+              ? "Your stress levels are elevated. Would you like some relaxation suggestions?" 
+              : "How are you feeling about your current tasks?",
+            options: isStressed 
+              ? [
+                  { label: "Show techniques", action: "stress_relief" },
+                  { label: "Not now", action: "dismiss" }
+                ]
+              : [
+                  { label: "Good", action: "feeling_good" },
+                  { label: "Need help", action: "need_help" }
+                ],
+            emotionalState,
+            timestamp: Date.now()
+          };
+          
+          // Send notification through WebSocket simulation
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.dispatchEvent(new MessageEvent('message', {
+              data: JSON.stringify({
+                type: 'notification',
+                data: notificationData
+              })
+            }));
+          }
+        }
+      }, 8000);
       
       return () => clearInterval(interval);
     }
-  }, [connected, biometricData, emotionalStates]);
+  }, [connected, biometricData, emotionalStates, socket]);
 
   // Send message function for WebSocket
   const sendMessage = (
@@ -185,6 +227,7 @@ export function BiometricsProvider({ children }: { children: ReactNode }) {
       emotionalStates,
       currentEmotionalState,
       connected,
+      connectionStatus,
       lastMessage,
       sendMessage
     }}>
