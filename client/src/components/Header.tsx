@@ -12,12 +12,7 @@ export function Header({ toggleSidebar }: HeaderProps) {
     <header className="bg-white border-b border-gray-200 py-3 px-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center space-x-2">
         <div className="flex items-center">
-          <img
-            src={NeurobicaLogoFull}
-            alt="Neurobica"
-            height={32}
-            className="h-8"
-          />
+          <img src={NeurobicaLogoFull} alt="Neurobica" className="h-8" />
         </div>
         <span className="text-xs bg-[#A78BFA] text-white px-2 py-0.5 rounded-full">
           POC
