@@ -97,8 +97,8 @@ export default function AudioRecorder({ onTranscription, className = '' }: Audio
       const data = await response.json();
       
       // Call the callback with transcription
-      if (data.success && data.text) {
-        onTranscription(data.text);
+      if (data.success && data.transcription) {
+        onTranscription(data.transcription);
       } else {
         throw new Error('No transcription data received');
       }
