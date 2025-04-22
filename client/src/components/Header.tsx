@@ -1,5 +1,5 @@
 import { useState } from "react";
-import NeurobicaLogoFull from "attached_assets/Neurobica_logo_full.png";
+import NeurobicaLogoFull from "attached_assets/Neurobica logo full.png";
 
 interface HeaderProps {
   toggleSidebar: () => void;
