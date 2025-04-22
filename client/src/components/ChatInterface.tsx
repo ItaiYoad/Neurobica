@@ -21,7 +21,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex-1 flex flex-col h-full">
       <ChatHeader toggleSidebar={toggleSidebar} emotionalState={emotionalState} />
       <ChatMessages 
         messages={messages} 

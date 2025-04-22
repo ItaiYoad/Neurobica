@@ -18,11 +18,9 @@ export default function Home() {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
         
-        <main className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 flex">
-            <ChatInterface toggleSidebar={toggleMobileSidebar} />
-            <SidePanel />
-          </div>
+        <main className="flex-1 flex overflow-hidden">
+          <ChatInterface toggleSidebar={toggleMobileSidebar} />
+          <SidePanel />
         </main>
       </div>
     </div>
