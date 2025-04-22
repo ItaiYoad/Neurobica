@@ -2,7 +2,6 @@ import { useRef, useEffect } from "react";
 import { ChatMessage } from "./ChatMessage";
 import { EmotionNotification } from "./EmotionNotification";
 import { Message, Notification } from "@/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -22,7 +21,7 @@ export function ChatMessages({ messages, notifications, isLoading }: ChatMessage
   const chatItems = [...messages, ...notifications].sort((a, b) => a.timestamp - b.timestamp);
 
   return (
-    <ScrollArea className="flex-1 p-4 bg-gray-50 h-[calc(100vh-8rem)]">
+    <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
       {chatItems.map((item) => {
         if ('role' in item) {
           // This is a message
@@ -46,6 +45,6 @@ export function ChatMessages({ messages, notifications, isLoading }: ChatMessage
       )}
       
       <div ref={messagesEndRef} />
-    </ScrollArea>
+    </div>
   );
 }
