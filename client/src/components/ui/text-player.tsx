@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,6 @@ export default function TextPlayer({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const silentAudioRef = useRef<HTMLAudioElement | null>(null);
-
 
   // Effect for auto-play when the component mounts or text changes
   useEffect(() => {
@@ -57,13 +57,14 @@ export default function TextPlayer({
     // Don't do anything if TTS is disabled
     if (!settings.ttsEnabled) return;
 
+    setIsLoading(true);
+
     try {
-      // Play a silent audio first to initialize audio context
-      if (!audioRef.current) {
-        const silent = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
-        await silent.play();
-        silent.pause();
-      }
+      // Play silent audio to enable autoplay
+      const silentAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
+      silentAudioRef.current = silentAudio;
+      await silentAudio.play().catch(() => {});
+      silentAudio.pause();
 
       // If we already have audio loaded, play it
       if (audioUrl && audioRef.current) {
@@ -71,15 +72,6 @@ export default function TextPlayer({
         setIsPlaying(true);
         return;
       }
-
-    setIsLoading(true);
-
-    try {
-      // Play silent audio to enable autoplay
-      const silentAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
-      silentAudioRef.current = silentAudio;
-      await silentAudio.play();
-      silentAudio.pause(); // Pause immediately after playing
 
       const response = await fetch('/api/audio/speech', {
         method: 'POST',
@@ -124,7 +116,6 @@ export default function TextPlayer({
       setIsPlaying(true);
     } catch (error: any) {
       console.error('Error generating speech:', error);
-      // Only show toast for non-autoplay errors
       if (!autoPlay) {
         toast({
           title: 'Text-to-speech failed',
