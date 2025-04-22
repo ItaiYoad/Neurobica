@@ -135,10 +135,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     onSelectChat?.(id);
   };
 
-  const handleNewChat = (type: ConversationType) => {
-    handleCreateChat(type.initialPrompt);
-    setShowNewChatDialog(false);
-  };
+  
 
   const handleDeleteChat = async (id: string) => {
     try {
