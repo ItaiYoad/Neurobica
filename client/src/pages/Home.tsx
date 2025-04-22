@@ -15,13 +15,11 @@ export default function Home() {
     <div className="font-sans bg-neutral-lighter text-neutral-dark h-screen flex flex-col">
       <Header toggleSidebar={toggleMobileSidebar} />
 
-      <div className="flex flex-1 h-[calc(100vh-4rem)] overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
 
         <main className="flex-1 flex overflow-hidden">
-          <div className="flex-1 flex flex-col">
-            <ChatInterface toggleSidebar={toggleMobileSidebar} />
-          </div>
+          <ChatInterface toggleSidebar={toggleMobileSidebar} />
           <SidePanel />
         </main>
       </div>
