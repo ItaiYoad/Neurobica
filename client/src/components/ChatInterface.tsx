@@ -21,13 +21,15 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] relative">
       <ChatHeader toggleSidebar={toggleSidebar} emotionalState={emotionalState} />
-      <ChatMessages 
-        messages={messages} 
-        notifications={notifications} 
-        isLoading={isLoading} 
-      />
+      <div className="flex-1 overflow-hidden">
+        <ChatMessages 
+          messages={messages} 
+          notifications={notifications} 
+          isLoading={isLoading} 
+        />
+      </div>
       <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
     </div>
   );
