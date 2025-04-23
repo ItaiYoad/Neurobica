@@ -77,7 +77,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
           <div className="w-full bg-white border border-blue-100 rounded-full shadow-sm">
             <textarea 
               ref={textareaRef}
-              className="w-full px-4 py-1.5 pr-32 focus:outline-none rounded-full resize-none overflow-hidden bg-transparent min-h-[32px] max-h-[120px] leading-normal"
+              className="w-full px-4 py-2 pr-32 focus:outline-none rounded-full resize-none overflow-hidden bg-transparent min-h-[40px] max-h-[120px]"
               placeholder="Type your message..."
               rows={1}
               value={message}
