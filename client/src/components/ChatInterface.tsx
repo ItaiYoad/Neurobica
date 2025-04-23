@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
@@ -24,23 +23,27 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
 
   const suggestions = [
     { icon: Search, text: "Search the web" },
-    { icon: Wand2, text: "Generate creative ideas" }
+    { icon: Wand2, text: "Generate creative ideas" },
   ];
 
   return (
     <div className="flex-1 flex flex-col h-screen relative">
-      <div 
-        className={`absolute ${messages.length > 0 ? 'bottom-32' : 'bottom-4'} left-4 bg-white/60 p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white/80 transition-all duration-300`}
+      <div
+        className={`absolute ${messages.length > 0 ? "bottom-32" : "bottom-4"} left-4 bg-white/60 p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white/80 transition-all duration-300`}
         onClick={() => setShowBiometrics(true)}
       >
         <div className="grid grid-cols-2 gap-2">
           <div className="p-1 border rounded-lg">
             <div className="text-xs text-gray-500">Heart Rate</div>
-            <div className="text-lg font-semibold text-red-500">{biometricData.heartRate} bpm</div>
+            <div className="text-lg font-semibold text-red-500">
+              {biometricData.heartRate} bpm
+            </div>
           </div>
           <div className="p-1 border rounded-lg">
             <div className="text-xs text-gray-500">EEG Alpha</div>
-            <div className="text-lg font-semibold text-green-500">{biometricData.eegAlpha.toFixed(1)} μV</div>
+            <div className="text-lg font-semibold text-green-500">
+              {biometricData.eegAlpha.toFixed(1)} μV
+            </div>
           </div>
         </div>
       </div>
@@ -55,11 +58,15 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 border rounded-lg">
                 <div className="text-sm text-gray-500">Heart Rate</div>
-                <div className="text-2xl font-semibold">{biometricData.heartRate} bpm</div>
+                <div className="text-2xl font-semibold">
+                  {biometricData.heartRate} bpm
+                </div>
               </div>
               <div className="p-4 border rounded-lg">
                 <div className="text-sm text-gray-500">EEG Alpha</div>
-                <div className="text-2xl font-semibold">{biometricData.eegAlpha.toFixed(1)} μV</div>
+                <div className="text-2xl font-semibold">
+                  {biometricData.eegAlpha.toFixed(1)} μV
+                </div>
               </div>
             </div>
           </div>
@@ -82,7 +89,10 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
             ))}
           </div>
           <div className="w-full max-w-3xl mt-8">
-            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+            />
           </div>
         </div>
       ) : (
@@ -91,12 +101,15 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
             <ChatMessages messages={messages} isLoading={isLoading} />
           </div>
           <div className="relative">
-            <img 
+            <img
               src="/Neurobica logo full.png"
               alt="Neurobica"
-              className="absolute right-4 bottom-4 h-5 opacity-30"
+              className="absolute right-4 bottom-4 h-5 opacity-90"
             />
-            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+            />
           </div>
         </>
       )}
