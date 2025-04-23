@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Menu, PlusCircle, Search } from "lucide-react";
+import { LifeScheduler } from "./scheduler/LifeScheduler";
 
 interface SidebarProps {
   isOpen: boolean;

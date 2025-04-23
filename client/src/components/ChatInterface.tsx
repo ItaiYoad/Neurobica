@@ -1,9 +1,13 @@
 
+import { useState } from "react";
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
 import { Button } from "./ui/button";
 import { Search, Wand2 } from "lucide-react";
+import { useBiometrics } from "@/context/BiometricsContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { BiometricChart } from "./biometrics/BiometricChart";
 
 interface ChatInterfaceProps {
   toggleSidebar: () => void;
