@@ -1,7 +1,9 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Menu, Search } from "lucide-react";
 import { ConversationList } from "./sidebar/ConversationList";
+import { useCallback, useEffect, useState } from "react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,6 +11,46 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    setTouchEnd(e.touches[0].clientX);
+  };
+
+  const onTouchEnd = useCallback(() => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    
+    if (isLeftSwipe && isOpen) {
+      onClose();
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  }, [touchStart, touchEnd, isOpen, onClose]);
+
+  useEffect(() => {
+    document.addEventListener('touchstart', onTouchStart);
+    document.addEventListener('touchmove', onTouchMove);
+    document.addEventListener('touchend', onTouchEnd);
+
+    return () => {
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [onTouchEnd]);
+
   return (
     <aside
       className={`

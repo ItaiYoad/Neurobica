@@ -5,12 +5,55 @@ import { LifeScheduler } from "./scheduler/LifeScheduler";
 import { useBiometrics } from "@/context/BiometricsContext";
 import { useLifeScheduler } from "@/hooks/useLifeScheduler";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Drawer, DrawerContent } from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
+import { useState, useEffect, useCallback } from "react";
 
 export function SidePanel() {
   const { biometricData } = useBiometrics();
   const { memoryItems, addMemoryItem } = useLifeScheduler();
   const isMobile = useIsMobile();
+  const [isOpen, setIsOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    setTouchEnd(e.touches[0].clientX);
+  };
+
+  const onTouchEnd = useCallback(() => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchEnd - touchStart;
+    const isRightSwipe = distance > minSwipeDistance;
+    
+    if (isRightSwipe && !isOpen) {
+      setIsOpen(true);
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  }, [touchStart, touchEnd, isOpen]);
+
+  useEffect(() => {
+    if (isMobile) {
+      document.addEventListener('touchstart', onTouchStart);
+      document.addEventListener('touchmove', onTouchMove);
+      document.addEventListener('touchend', onTouchEnd);
+
+      return () => {
+        document.removeEventListener('touchstart', onTouchStart);
+        document.removeEventListener('touchmove', onTouchMove);
+        document.removeEventListener('touchend', onTouchEnd);
+      };
+    }
+  }, [isMobile, onTouchEnd]);
 
   const content = (
     <ScrollArea className="h-full">
@@ -42,7 +85,7 @@ export function SidePanel() {
 
   if (isMobile) {
     return (
-      <Drawer>
+      <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerContent side="right" className="w-[85vw] max-w-[400px] h-full p-0">
           {content}
         </DrawerContent>
