@@ -17,7 +17,10 @@ import type {
 
 export function setupRoutes(app: Express): Server {
   const httpServer = createServer(app);
-  const wss = new WebSocketServer({ server: httpServer });
+  const wss = new WebSocketServer({ 
+    server: httpServer,
+    path: "/ws" // Specify explicit path for WebSocket connections
+  });
   setupWebSocketHandlers(wss);
   const upload = multer();
 
