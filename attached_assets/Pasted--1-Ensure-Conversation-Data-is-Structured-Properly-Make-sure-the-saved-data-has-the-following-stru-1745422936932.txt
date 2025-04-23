@@ -1,0 +1,95 @@
+✅ 1. Ensure Conversation Data is Structured Properly
+Make sure the saved data has the following structure:
+
+json
+Copy
+Edit
+{
+  "id": "conversation_id",
+  "title": "Conversation with GPT on emotions",
+  "messages": [
+    { "role": "user", "content": "How are emotions formed?" },
+    { "role": "assistant", "content": "Emotions are..." }
+  ],
+  "createdAt": "2025-04-23T18:00:00Z"
+}
+This data should be associated with a unique ID (UUID or DB ID).
+
+✅ 2. Conversation List Component
+The conversations list should be rendering clickable elements:
+
+tsx
+Copy
+Edit
+<li onClick={() => openConversation(convo.id)}>
+  {convo.title}
+</li>
+Make sure:
+
+openConversation() is bound and not silently failing.
+
+You’re using the right conversation.id.
+
+✅ 3. Retrieve Conversation on Click
+When openConversation(convoId) is called:
+
+ts
+Copy
+Edit
+async function openConversation(convoId: string) {
+  const convo = await fetch(`/api/conversations/${convoId}`).then(res => res.json());
+  setCurrentConversation(convo); // Assuming you're using state
+}
+Backend endpoint /api/conversations/:id must:
+
+Fetch the conversation from DB
+
+Return the full messages array
+
+✅ 4. Render Messages in Chat Interface
+Once currentConversation is set:
+
+tsx
+Copy
+Edit
+{currentConversation?.messages.map((msg, i) => (
+  <ChatBubble key={i} role={msg.role} content={msg.content} />
+))}
+Make sure:
+
+The component re-renders on state change
+
+The chat input area is not disabled or in a new conversation mode
+
+✅ 5. Handle State Switching
+Some apps accidentally reset state when switching views. Ensure:
+
+You don’t reset the chat interface state when switching to an old convo
+
+currentConversation persists through routing (or store in context / Redux / Zustand)
+
+✅ 6. Troubleshoot with Logs
+Add logs:
+
+ts
+Copy
+Edit
+console.log("Clicked convo ID:", convoId);
+console.log("Fetched conversation:", convo);
+This will show if:
+
+The convo is fetched correctly
+
+The state is being set
+
+The render is happening as expected
+
+✅ 7. Optional - Add Smooth Transitions
+To enhance UX:
+
+Show a loading spinner while fetching
+
+Scroll to the bottom of the chat after render
+
+Highlight the selected conversation in the list
+

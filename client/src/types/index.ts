@@ -30,6 +30,8 @@ export type Message = {
   timestamp: number;
   emotionalContext?: string;
   memoryTrigger?: MemoryItem;
+  isVoiceMessage?: boolean;
+  conversationId?: string | null;
 };
 
 // Notification Types

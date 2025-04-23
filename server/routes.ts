@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { WebSocketServer } from "ws";
@@ -7,6 +7,21 @@ import { chatHandler } from "./services/openai";
 import WebSocket from "ws";
 import { extractMemoriesFromText } from "./services/biometrics";
 import { nanoid } from "nanoid";
+import multer from 'multer';
+import { 
+  type InsertMessage, 
+  type InsertConversation, 
+  type InsertMemory, 
+  type InsertLog, 
+  type InsertBiometricData 
+} from "@shared/schema";
+import { speechToText, textToSpeech } from './services/openai-audio';
+
+// Configure multer for audio file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -16,14 +31,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup WebSocket handlers with async initialization
   await setupWebSocketHandlers(wss);
   
+  // CONVERSATIONS ENDPOINTS
+  
+  // Get all conversations
+  app.get("/api/conversations", async (req, res) => {
+    try {
+      const conversations = await storage.getAllConversations();
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create a new conversation
+  app.post("/api/conversations", async (req, res) => {
+    try {
+      const { title = "New Conversation", userId = null } = req.body;
+      
+      const conversation = await storage.createConversation({
+        id: nanoid(),
+        title,
+        userId,
+        summary: null,
+        emotionalTag: null,
+        lastMessageAt: null,
+        messageCount: 0
+      });
+      
+      res.status(201).json(conversation);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get a single conversation by ID
+  app.get("/api/conversations/:id", async (req, res) => {
+    try {
+      const conversation = await storage.getConversation(req.params.id);
+      
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      res.json(conversation);
+    } catch (error) {
+      console.error(`Error fetching conversation ${req.params.id}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update a conversation
+  app.patch("/api/conversations/:id", async (req, res) => {
+    try {
+      const { title, summary, emotionalTag } = req.body;
+      const updates: Partial<InsertConversation> = {};
+      
+      if (title !== undefined) updates.title = title;
+      if (summary !== undefined) updates.summary = summary;
+      if (emotionalTag !== undefined) updates.emotionalTag = emotionalTag;
+      
+      const conversation = await storage.updateConversation(req.params.id, updates);
+      
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      res.json(conversation);
+    } catch (error) {
+      console.error(`Error updating conversation ${req.params.id}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete a conversation
+  app.delete("/api/conversations/:id", async (req, res) => {
+    try {
+      const conversationExists = await storage.getConversation(req.params.id);
+      
+      if (!conversationExists) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      await storage.deleteConversation(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error(`Error deleting conversation ${req.params.id}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get messages for a conversation
+  app.get("/api/conversations/:id/messages", async (req, res) => {
+    try {
+      const conversationExists = await storage.getConversation(req.params.id);
+      
+      if (!conversationExists) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const messages = await storage.getMessagesByConversation(req.params.id, limit);
+      
+      res.json(messages);
+    } catch (error) {
+      console.error(`Error fetching messages for conversation ${req.params.id}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Chat endpoint
   app.post("/api/chat", async (req, res) => {
     try {
-      const { message, emotionalState } = req.body;
+      const { message, emotionalState, conversationId } = req.body;
       
       if (!message) {
         return res.status(400).json({ message: "Message is required" });
       }
+      
+      // Create or get conversation
+      let currentConversationId = conversationId;
+      if (!currentConversationId) {
+        // Create a new conversation if none provided
+        const newConversation = await storage.createConversation({
+          id: nanoid(),
+          title: "New Conversation", // Will be updated after first message
+          userId: null,
+          summary: null,
+          emotionalTag: emotionalState && emotionalState.label ? emotionalState.label : null,
+          lastMessageAt: new Date(),
+          messageCount: 0
+        });
+        currentConversationId = newConversation.id;
+      }
+      
+      // Store the user message
+      const userMessageId = nanoid();
+      await storage.createMessage({
+        id: userMessageId,
+        conversationId: currentConversationId,
+        role: "user",
+        content: message,
+        emotionalContext: emotionalState && emotionalState.label ? emotionalState.label : null,
+        memoryTriggerId: null
+      });
       
       // Log the chat message
       const logId = nanoid();
@@ -31,12 +183,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: logId,
         type: "message",
         message: `User message: ${message.substring(0, 50)}${message.length > 50 ? '...' : ''}`,
-        data: { message, emotionalState },
+        data: { message, emotionalState, conversationId: currentConversationId },
       });
       
       // Process chat in background
       chatHandler(message, emotionalState)
-        .then(response => {
+        .then(async response => {
           // Broadcast message to all clients
           const messageId = nanoid();
           
@@ -83,9 +235,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
           }
           
-          // Store the message
-          storage.createMessage({
+          // Store the assistant message
+          await storage.createMessage({
             id: messageId,
+            conversationId: currentConversationId,
             role: "assistant",
             content: response.message,
             emotionalContext: response.emotionalContext,
@@ -99,6 +252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 type: "chat_message",
                 data: {
                   id: messageId,
+                  conversationId: currentConversationId,
                   role: "assistant",
                   content: response.message,
                   emotionalContext: response.emotionalContext,
@@ -116,11 +270,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           // Log the response
-          storage.createLog({
+          await storage.createLog({
             id: nanoid(),
             type: "message",
             message: `Assistant response: ${response.message.substring(0, 50)}${response.message.length > 50 ? '...' : ''}`,
-            data: { message: response.message, emotionalContext: response.emotionalContext }
+            data: { message: response.message, emotionalContext: response.emotionalContext, conversationId: currentConversationId }
           });
           
         })
@@ -132,12 +286,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: nanoid(),
             type: "alert",
             message: `Chat processing error: ${error.message}`,
-            data: { error: error.message }
+            data: { error: error.message, conversationId: currentConversationId }
           });
         });
       
       // Acknowledge receipt immediately
-      res.json({ message: "Message received, processing" });
+      res.json({ message: "Message received, processing", conversationId: currentConversationId });
       
     } catch (error) {
       console.error("Chat error:", error);
@@ -505,5 +659,165 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Speech-to-Text endpoint
+  app.post("/api/audio/transcribe", upload.single('audio'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No audio file provided" });
+      }
+      
+      // Check if OpenAI API key is configured
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ 
+          success: false, 
+          message: "OpenAI API key not configured. Please set the OPENAI_API_KEY environment variable." 
+        });
+      }
+      
+      const audioBuffer = req.file.buffer;
+      const language = req.body.language;
+      const prompt = req.body.prompt;
+      
+      // Transcribe audio to text
+      const transcription = await speechToText(audioBuffer, `${nanoid()}.mp3`, { 
+        language, 
+        prompt 
+      });
+      
+      // Log successful transcription
+      await storage.createLog({
+        id: nanoid(),
+        type: "audio",
+        message: `Audio transcribed successfully (${Math.round(audioBuffer.length / 1024)} KB)`,
+        data: { 
+          transcription: transcription.substring(0, 100) + (transcription.length > 100 ? '...' : '') 
+        }
+      });
+      
+      res.json({ success: true, transcription });
+    } catch (error: unknown) {
+      console.error("Error transcribing audio:", error);
+      
+      // Extract error message safely
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      // Log the error
+      await storage.createLog({
+        id: nanoid(),
+        type: "error",
+        message: `Audio transcription error: ${errorMessage}`,
+        data: { error: errorMessage }
+      });
+      
+      res.status(500).json({ 
+        success: false, 
+        message: `Failed to transcribe audio: ${errorMessage}` 
+      });
+    }
+  });
+  
+  // Text-to-Speech endpoint
+  app.post("/api/audio/speech", async (req, res) => {
+    try {
+      const { text, voice, speed } = req.body;
+      
+      if (!text) {
+        return res.status(400).json({ message: "Text is required" });
+      }
+      
+      // Check if OpenAI API key is configured
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ 
+          success: false, 
+          message: "OpenAI API key not configured. Please set the OPENAI_API_KEY environment variable." 
+        });
+      }
+      
+      // Convert text to speech
+      const { audio, contentType } = await textToSpeech(text, { voice, speed });
+      
+      // Log successful TTS generation
+      await storage.createLog({
+        id: nanoid(),
+        type: "audio",
+        message: `Generated speech audio for text (${Math.round(text.length)} chars)`,
+        data: { text: text.substring(0, 100) + (text.length > 100 ? '...' : '') }
+      });
+      
+      // Set the appropriate content type and send the audio data
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', 'attachment; filename="speech.mp3"');
+      res.send(audio);
+    } catch (error: unknown) {
+      console.error("Error generating speech:", error);
+      
+      // Extract error message safely
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      // Log the error
+      await storage.createLog({
+        id: nanoid(),
+        type: "error",
+        message: `Text-to-speech error: ${errorMessage}`,
+        data: { error: errorMessage }
+      });
+      
+      res.status(500).json({ 
+        success: false, 
+        message: `Failed to generate speech: ${errorMessage}` 
+      });
+    }
+  });
+  
+  // Audio settings endpoint
+  app.get("/api/audio/settings", async (req, res) => {
+    try {
+      res.json({
+        ttsEnabled: true,
+        sttEnabled: true,
+        voiceOptions: [
+          { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced voice' },
+          { id: 'echo', name: 'Echo', description: 'Deeper, authoritative voice' },
+          { id: 'fable', name: 'Fable', description: 'Expressive, narrative-focused voice' },
+          { id: 'onyx', name: 'Onyx', description: 'Versatile, professional voice' },
+          { id: 'nova', name: 'Nova', description: 'Warm, natural voice' },
+          { id: 'shimmer', name: 'Shimmer', description: 'Clear, optimistic voice' }
+        ],
+        defaultVoice: 'nova',
+        speedOptions: [
+          { value: 0.8, label: 'Slow' },
+          { value: 1.0, label: 'Normal' },
+          { value: 1.2, label: 'Fast' }
+        ],
+        defaultSpeed: 1.0
+      });
+    } catch (error) {
+      console.error("Error fetching audio settings:", error);
+      res.status(500).json({ message: "Failed to fetch audio settings" });
+    }
+  });
+  
+  // Update audio settings endpoint
+  app.post("/api/audio/settings", async (req, res) => {
+    try {
+      const { ttsEnabled, sttEnabled, defaultVoice, defaultSpeed } = req.body;
+      
+      // Here you would normally save these settings to a database or config file
+      // For now, just acknowledge the update
+      
+      await storage.createLog({
+        id: nanoid(),
+        type: "config",
+        message: "Audio settings updated",
+        data: { ttsEnabled, sttEnabled, defaultVoice, defaultSpeed }
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating audio settings:", error);
+      res.status(500).json({ message: "Failed to update audio settings" });
+    }
+  });
+  
   return httpServer;
 }

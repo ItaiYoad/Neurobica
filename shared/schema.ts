@@ -44,6 +44,9 @@ export const conversations = pgTable("conversations", {
   title: text("title").notNull(),
   userId: integer("user_id").references(() => users.id),
   summary: text("summary"),
+  emotionalTag: text("emotional_tag"),
+  lastMessageAt: timestamp("last_message_at"),
+  messageCount: integer("message_count").default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -53,6 +56,9 @@ export const insertConversationSchema = createInsertSchema(conversations).pick({
   title: true,
   userId: true,
   summary: true,
+  emotionalTag: true,
+  lastMessageAt: true,
+  messageCount: true,
 });
 
 export type InsertConversation = z.infer<typeof insertConversationSchema>;
