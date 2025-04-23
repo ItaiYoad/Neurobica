@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useConversations, Conversation } from "@/hooks/useConversations";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -52,23 +52,23 @@ export function ConversationList() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newTitle, setNewTitle] = useState("");
   
-  const handleStartNewChat = () => {
+  const handleStartNewChat = useCallback(() => {
     startNewConversation();
-  };
+  }, [startNewConversation]);
   
-  const handleSelectConversation = (conversationId: string) => {
+  const handleSelectConversation = useCallback((conversationId: string) => {
     if (conversationId !== activeConversationId) {
       setActiveConversation(conversationId);
     }
-  };
+  }, [activeConversationId, setActiveConversation]);
   
-  const handleRenameClick = (conversation: Conversation) => {
+  const handleRenameClick = useCallback((conversation: Conversation) => {
     setSelectedConversation(conversation);
     setNewTitle(conversation.title);
     setIsRenameDialogOpen(true);
-  };
+  }, []);
   
-  const handleRenameSubmit = async () => {
+  const handleRenameSubmit = useCallback(async () => {
     if (!selectedConversation) return;
     
     try {
@@ -90,14 +90,14 @@ export function ConversationList() {
         variant: "destructive"
       });
     }
-  };
+  }, [selectedConversation, newTitle, renameConversation, toast]);
   
-  const handleDeleteClick = (conversation: Conversation) => {
+  const handleDeleteClick = useCallback((conversation: Conversation) => {
     setSelectedConversation(conversation);
     setIsDeleteDialogOpen(true);
-  };
+  }, []);
   
-  const handleDeleteSubmit = async () => {
+  const handleDeleteSubmit = useCallback(async () => {
     if (!selectedConversation) return;
     
     try {
@@ -116,7 +116,7 @@ export function ConversationList() {
         variant: "destructive"
       });
     }
-  };
+  }, [selectedConversation, deleteConversation, toast]);
   
   // Function to get emotion icon based on emotional tag
   const getEmotionIcon = (emotionalTag: string | null) => {

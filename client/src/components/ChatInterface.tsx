@@ -4,7 +4,7 @@ import { useChat } from "@/hooks/useChat";
 import { Button } from "./ui/button";
 import { Search, Wand2, Calendar, Brain, Clock, Heart, Sparkles } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-import { useEffect } from "react";
+import { useCallback } from "react";
 
 interface ChatInterfaceProps {
   toggleSidebar: () => void;
@@ -20,9 +20,9 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
     activeConversation 
   } = useChat();
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = useCallback((content: string) => {
     sendMessage(content);
-  };
+  }, [sendMessage]);
 
   const convoSuggestions = [
     { 
