@@ -46,25 +46,33 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         const data = JSON.parse(event.data);
         
         if (data.type === 'notification') {
-          const notification: Notification = {
-            id: data.data.id,
-            type: data.data.type,
-            title: data.data.title,
-            message: data.data.message,
-            options: data.data.options,
-            emotionalState: data.data.emotionalState,
-            read: false,
-            timestamp: data.data.timestamp || Date.now()
-          };
+          const notificationId = data.data.id;
           
-          // Add notification
-          setNotifications(prev => [notification, ...prev]);
-          
-          // Show toast for new notification
-          toast({
-            title: notification.title,
-            description: notification.message,
-            variant: notification.type === 'alert' ? 'destructive' : 'default',
+          // Check if notification already exists
+          setNotifications(prev => {
+            if (prev.some(n => n.id === notificationId)) {
+              return prev; // Skip if notification already exists
+            }
+            
+            const notification: Notification = {
+              id: notificationId,
+              type: data.data.type,
+              title: data.data.title,
+              message: data.data.message,
+              options: data.data.options,
+              emotionalState: data.data.emotionalState,
+              read: false,
+              timestamp: data.data.timestamp || Date.now()
+            };
+            
+            // Show toast for new notification
+            toast({
+              title: notification.title,
+              description: notification.message,
+              variant: notification.type === 'alert' ? 'destructive' : 'default',
+            });
+            
+            return [notification, ...prev];
           });
         }
       } catch (error) {
