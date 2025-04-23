@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Menu, PlusCircle, Search } from "lucide-react";
 import { LifeScheduler } from "./scheduler/LifeScheduler";
+import { useBiometrics } from "@/context/BiometricsContext";
+import { useSystemLogs } from "@/hooks/useSystemLogs";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,6 +13,13 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const [memoryItems, setMemoryItems] = useState([]);
+  const { logs } = useSystemLogs();
+  const { biometricData } = useBiometrics();
+
+  const addMemoryItem = (item: any) => {
+    setMemoryItems([...memoryItems, item]);
+  };
   const [conversations] = useState([]);
 
   return (
