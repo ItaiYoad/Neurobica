@@ -10,9 +10,14 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isOpen, setIsOpen] = useState(propIsOpen);
+
+  useEffect(() => {
+    setIsOpen(propIsOpen);
+  }, [propIsOpen]);
 
   const minSwipeDistance = 50;
 
@@ -31,11 +36,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const distance = touchEnd - touchStart;
     const isRightSwipe = distance > minSwipeDistance;
     const isLeftSwipe = distance < -minSwipeDistance;
-    const startedFromLeftEdge = touchStart < 30;
     
     if (!isOpen && isRightSwipe) {
       setIsOpen(true);
+      onClose(); // This actually opens the sidebar in the parent component
     } else if (isOpen && isLeftSwipe) {
+      setIsOpen(false);
       onClose();
     }
     
