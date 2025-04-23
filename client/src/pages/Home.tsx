@@ -21,13 +21,16 @@ export default function Home() {
         <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
 
         <main className="flex-1 flex overflow-hidden">
-          <div className={`flex-1 transition-all duration-300 ${mobileSidebarOpen ? 'ml-[260px]' : ''}`}>
+          <div className="flex-1">
             <ChatInterface />
           </div>
-          <div className={`transition-all duration-300 ${mobileSidebarOpen ? 'w-[260px]' : 'w-80'}`}>
+          <div className="hidden md:block w-80">
             <SidePanel />
           </div>
         </main>
+        <div className="md:hidden">
+          <SidePanel />
+        </div>
       </div>
     </div>
   );
