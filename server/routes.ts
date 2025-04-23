@@ -7,6 +7,7 @@ import { nanoid } from "nanoid";
 import { storage } from "./storage";
 import { setupWebSocketHandlers } from "./services/webSocket";
 import { chatHandler, generateChatTitle } from "./services/openai";
+import { textToSpeech } from "./services/openai-audio";
 import { extractMemoriesFromText } from "./services/biometrics";
 import type {
   InsertMessage,

@@ -20,12 +20,13 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   // Message methods
   createMessage(message: InsertMessage): Promise<Message>;
   getMessages(limit?: number): Promise<Message[]>;
   getMessagesByConversation(conversationId: string, limit?: number): Promise<Message[]>;
-  
+  getMessageCount(conversationId: string): Promise<number>; // Added getMessageCount
+
   // Conversation methods
   createConversation(conversation: InsertConversation): Promise<Conversation>;
   getConversation(id: string): Promise<Conversation | undefined>;
@@ -33,18 +34,18 @@ export interface IStorage {
   updateConversation(id: string, updates: Partial<InsertConversation>): Promise<Conversation | undefined>;
   deleteConversation(id: string): Promise<void>;
   generateTitleFromMessage(message: string): Promise<string>;
-  
+
   // Memory methods
   createMemory(memory: InsertMemory): Promise<Memory>;
   getMemory(id: string): Promise<Memory | undefined>;
   getAllMemories(): Promise<Memory[]>;
   updateMemory(id: string, memory: Partial<InsertMemory>): Promise<Memory | undefined>;
   deleteMemory(id: string): Promise<void>;
-  
+
   // Log methods
   createLog(log: InsertLog): Promise<Log>;
   getLogs(limit?: number): Promise<Log[]>;
-  
+
   // Biometric data methods
   createBiometricData(data: InsertBiometricData): Promise<BiometricData>;
   getLatestBiometricData(): Promise<BiometricData | undefined>;
@@ -58,7 +59,7 @@ export class MemStorage implements IStorage {
   private logs: Map<string, Log>;
   private biometricData: Map<string, BiometricData>;
   private conversations: Map<string, Conversation>;
-  
+
   currentUserId: number;
 
   constructor() {
@@ -88,14 +89,14 @@ export class MemStorage implements IStorage {
     this.users.set(id, user);
     return user;
   }
-  
+
   // Message methods
   async createMessage(message: InsertMessage): Promise<Message> {
     const id = message.id || nanoid();
     const timestamp = new Date();
-    
+
     const conversationId = typeof message.conversationId === 'string' ? message.conversationId : null;
-    
+
     const newMessage: Message = {
       id,
       conversationId,
@@ -105,9 +106,9 @@ export class MemStorage implements IStorage {
       emotionalContext: message.emotionalContext || null,
       memoryTriggerId: message.memoryTriggerId || null
     };
-    
+
     this.messages.set(id, newMessage);
-    
+
     // If this message belongs to a conversation, update the conversation's lastMessageAt and messageCount
     if (message.conversationId) {
       const conversation = await this.getConversation(message.conversationId);
@@ -124,28 +125,32 @@ export class MemStorage implements IStorage {
         });
       }
     }
-    
+
     return newMessage;
   }
-  
+
   async getMessages(limit: number = 50): Promise<Message[]> {
     return Array.from(this.messages.values())
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit);
   }
-  
+
   async getMessagesByConversation(conversationId: string, limit: number = 50): Promise<Message[]> {
     return Array.from(this.messages.values())
       .filter(message => message.conversationId === conversationId)
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
       .slice(0, limit);
   }
-  
+
+  async getMessageCount(conversationId: string): Promise<number> { // Added getMessageCount implementation
+    return this.messages.values().filter(msg => msg.conversationId === conversationId).length;
+  }
+
   // Conversation methods
   async createConversation(conversation: InsertConversation): Promise<Conversation> {
     const id = conversation.id || nanoid();
     const now = new Date();
-    
+
     const newConversation: Conversation = {
       id,
       title: conversation.title || "New Conversation",
@@ -157,15 +162,15 @@ export class MemStorage implements IStorage {
       createdAt: now,
       updatedAt: now
     };
-    
+
     this.conversations.set(id, newConversation);
     return newConversation;
   }
-  
+
   async getConversation(id: string): Promise<Conversation | undefined> {
     return this.conversations.get(id);
   }
-  
+
   async getAllConversations(): Promise<Conversation[]> {
     return Array.from(this.conversations.values())
       .sort((a, b) => {
@@ -175,25 +180,25 @@ export class MemStorage implements IStorage {
         return bTime - aTime;
       });
   }
-  
+
   async updateConversation(id: string, updates: Partial<InsertConversation>): Promise<Conversation | undefined> {
     const conversation = this.conversations.get(id);
     if (!conversation) return undefined;
-    
+
     const updatedConversation: Conversation = {
       ...conversation,
       ...updates,
       id,
       updatedAt: new Date()
     };
-    
+
     this.conversations.set(id, updatedConversation);
     return updatedConversation;
   }
-  
+
   async deleteConversation(id: string): Promise<void> {
     this.conversations.delete(id);
-    
+
     // Delete all messages associated with this conversation
     const allMessages = Array.from(this.messages.entries());
     allMessages.forEach(([msgId, message]) => {
@@ -202,29 +207,29 @@ export class MemStorage implements IStorage {
       }
     });
   }
-  
+
   async generateTitleFromMessage(message: string): Promise<string> {
     // Generate a short title from the message (3-5 words)
     if (!message || message.trim() === '') {
       return "New Conversation";
     }
-    
+
     // Just take the first few words, up to 30 characters
     const words = message.trim().split(/\s+/);
     let title = words.slice(0, 5).join(' ');
-    
+
     if (title.length > 30) {
       title = title.substring(0, 27) + '...';
     }
-    
+
     return title;
   }
-  
+
   // Memory methods
   async createMemory(memory: InsertMemory): Promise<Memory> {
     const id = memory.id || nanoid();
     const createdAt = new Date();
-    
+
     const newMemory: Memory = {
       id,
       type: memory.type,
@@ -233,46 +238,46 @@ export class MemStorage implements IStorage {
       category: memory.category || null,
       createdAt
     };
-    
+
     this.memories.set(id, newMemory);
     return newMemory;
   }
-  
+
   async getMemory(id: string): Promise<Memory | undefined> {
     return this.memories.get(id);
   }
-  
+
   async getAllMemories(): Promise<Memory[]> {
     return Array.from(this.memories.values())
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
-  
+
   async updateMemory(id: string, memory: Partial<InsertMemory>): Promise<Memory | undefined> {
     const existingMemory = this.memories.get(id);
-    
+
     if (!existingMemory) {
       return undefined;
     }
-    
+
     const updatedMemory: Memory = {
       ...existingMemory,
       ...memory,
       id,
     };
-    
+
     this.memories.set(id, updatedMemory);
     return updatedMemory;
   }
-  
+
   async deleteMemory(id: string): Promise<void> {
     this.memories.delete(id);
   }
-  
+
   // Log methods
   async createLog(log: InsertLog): Promise<Log> {
     const id = log.id || nanoid();
     const timestamp = new Date();
-    
+
     const newLog: Log = {
       id,
       type: log.type,
@@ -280,22 +285,22 @@ export class MemStorage implements IStorage {
       data: log.data || null,
       timestamp
     };
-    
+
     this.logs.set(id, newLog);
     return newLog;
   }
-  
+
   async getLogs(limit: number = 20): Promise<Log[]> {
     return Array.from(this.logs.values())
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit);
   }
-  
+
   // Biometric data methods
   async createBiometricData(data: InsertBiometricData): Promise<BiometricData> {
     const id = data.id || nanoid();
     const timestamp = new Date();
-    
+
     const newData: BiometricData = {
       id,
       timestamp,
@@ -303,11 +308,11 @@ export class MemStorage implements IStorage {
       eegAlpha: data.eegAlpha || null,
       emotionalStates: data.emotionalStates || null
     };
-    
+
     this.biometricData.set(id, newData);
     return newData;
   }
-  
+
   async getLatestBiometricData(): Promise<BiometricData | undefined> {
     return Array.from(this.biometricData.values())
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];

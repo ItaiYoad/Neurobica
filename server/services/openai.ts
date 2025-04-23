@@ -58,7 +58,7 @@ export async function chatHandler(
       id: nanoid(),
       type: "response",
       message: aiMessage,
-      data: completion.toJSON(),
+      data: completion,
     });
 
     return { message: aiMessage };
