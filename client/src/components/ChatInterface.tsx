@@ -25,6 +25,52 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
     refetchMessages
   } = useChat();
 
+  // Listen for our custom conversation selection event
+  useEffect(() => {
+    const handleConversationSelected = (event: CustomEvent<{id: string}>) => {
+      console.log("📣 Received conversation-selected event:", event.detail.id);
+      
+      // Force a refresh of messages
+      if (refetchMessages) {
+        console.log("📣 Forcing message refresh for conversation:", event.detail.id);
+        refetchMessages();
+      }
+    };
+    
+    // Need to cast the event handler to any to work around TypeScript's strict event typing
+    window.addEventListener('conversation-selected', handleConversationSelected as any);
+    
+    return () => {
+      window.removeEventListener('conversation-selected', handleConversationSelected as any);
+    };
+  }, [refetchMessages]);
+  
+  // Listen for the localStorage flag we set in the new chat handler
+  useEffect(() => {
+    const checkForClearMessages = () => {
+      const shouldClear = window.localStorage.getItem('tempClearMessages');
+      
+      if (shouldClear === 'true') {
+        console.log("📣 Detected tempClearMessages flag, refreshing chat interface");
+        // Clear the flag
+        window.localStorage.removeItem('tempClearMessages');
+        
+        // Force new chat
+        startNewConversation();
+      }
+    };
+    
+    // Check on mount and whenever the component re-renders
+    checkForClearMessages();
+    
+    // Also set an interval to check periodically (helps with race conditions)
+    const interval = setInterval(checkForClearMessages, 500);
+    
+    return () => {
+      clearInterval(interval);
+    };
+  }, [startNewConversation]);
+
   const handleSendMessage = useCallback((content: string) => {
     sendMessage(content);
   }, [sendMessage]);

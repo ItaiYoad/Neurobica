@@ -66,23 +66,56 @@ export function useChat() {
     refetchOnWindowFocus: false
   });
 
-  // When conversation messages data changes, update our messages state
+  // When active conversation ID changes, load messages directly
   useEffect(() => {
-    console.log("Conversation messages state changed", {
-      activeConversationId,
-      hasMessages: conversationMessages.length > 0,
-      messageCount: conversationMessages.length
-    });
+    console.log("⚠️ Active conversation ID changed to:", activeConversationId);
     
-    if (activeConversationId && conversationMessages) {
-      console.log("Setting messages for active conversation", activeConversationId);
-      // Replace the messages completely, don't append
-      setMessages([...conversationMessages]);
-    } else if (!activeConversationId) {
-      console.log("No active conversation, clearing messages");
-      setMessages([]);
+    const loadMessages = async () => {
+      if (activeConversationId) {
+        try {
+          console.log("⚠️ Directly loading messages for:", activeConversationId);
+          const response = await fetch(`/api/conversations/${activeConversationId}/messages`);
+          
+          if (!response.ok) {
+            throw new Error(`Failed to fetch messages: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log("⚠️ Direct message loading complete, messages:", data.length);
+          
+          // Format messages to match our app's format
+          const formattedMessages = data.map((msg: any) => ({
+            id: msg.id,
+            role: msg.role,
+            content: msg.content,
+            timestamp: new Date(msg.timestamp).getTime(),
+            emotionalContext: msg.emotionalContext || null,
+            memoryTrigger: msg.memoryTrigger || null,
+            conversationId: msg.conversationId
+          }));
+          
+          // Completely replace messages
+          setMessages(formattedMessages);
+        } catch (error) {
+          console.error("⚠️ Error loading messages directly:", error);
+        }
+      } else {
+        console.log("⚠️ No active conversation, clearing messages");
+        setMessages([]);
+      }
+    };
+    
+    // Load messages when conversation changes
+    loadMessages();
+    
+  }, [activeConversationId]); // Only depend on activeConversationId, not messages
+  
+  // Legacy - just for safety in case message query triggers
+  useEffect(() => {
+    if (conversationMessages.length > 0) {
+      console.log("conversationMessages query also returned data:", conversationMessages.length, "messages");
     }
-  }, [activeConversationId, conversationMessages]);
+  }, [conversationMessages]);
 
   // Listen for incoming websocket messages
   useEffect(() => {

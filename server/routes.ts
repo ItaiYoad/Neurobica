@@ -695,20 +695,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.json({ success: true, transcription });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error transcribing audio:", error);
+      
+      // Extract error message safely
+      const errorMessage = error instanceof Error ? error.message : String(error);
       
       // Log the error
       await storage.createLog({
         id: nanoid(),
         type: "error",
-        message: `Audio transcription error: ${error.message || 'Unknown error'}`,
-        data: { error: error.message || 'Unknown error' }
+        message: `Audio transcription error: ${errorMessage}`,
+        data: { error: errorMessage }
       });
       
       res.status(500).json({ 
         success: false, 
-        message: `Failed to transcribe audio: ${error.message || 'Unknown error'}` 
+        message: `Failed to transcribe audio: ${errorMessage}` 
       });
     }
   });
@@ -745,20 +748,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', 'attachment; filename="speech.mp3"');
       res.send(audio);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error generating speech:", error);
+      
+      // Extract error message safely
+      const errorMessage = error instanceof Error ? error.message : String(error);
       
       // Log the error
       await storage.createLog({
         id: nanoid(),
         type: "error",
-        message: `Text-to-speech error: ${error.message || 'Unknown error'}`,
-        data: { error: error.message || 'Unknown error' }
+        message: `Text-to-speech error: ${errorMessage}`,
+        data: { error: errorMessage }
       });
       
       res.status(500).json({ 
         success: false, 
-        message: `Failed to generate speech: ${error.message || 'Unknown error'}` 
+        message: `Failed to generate speech: ${errorMessage}` 
       });
     }
   });

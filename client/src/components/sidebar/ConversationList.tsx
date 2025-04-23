@@ -87,29 +87,26 @@ export function ConversationList() {
     
     try {
       if (conversationId !== activeConversationId) {
-        // Immediately set a loading state if needed
-        // setIsLoading(true);
-        
         console.log("🎯 Setting active conversation to:", conversationId);
         
-        // 1. Directly fetch the conversation messages using fetch API
-        console.log("🎯 Directly fetching messages for conversation", conversationId);
-        const response = await fetch(`/api/conversations/${conversationId}/messages`);
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch messages: ${response.status}`);
+        // Reset any current conversation first if needed
+        if (activeConversationId !== null) {
+          // First set to null to clear any existing messages/state
+          await setActiveConversation(null);
+          
+          // Force a small delay for state to clear
+          await new Promise(resolve => setTimeout(resolve, 50));
         }
         
-        const messages = await response.json();
-        console.log("🎯 Directly fetched messages:", messages.length);
-        
-        // 2. Set active conversation - wait for this to complete
+        // Now set the active conversation to the selected one
         await setActiveConversation(conversationId);
         
-        // 3. Force messages to be available - only if getMessages is available from hook
-        // Skip this step as it's handled by our direct fetch
-        
         console.log("🎯 Conversation selection completed for:", conversationId);
+        
+        // Force a refresh of the component
+        window.dispatchEvent(new CustomEvent('conversation-selected', { 
+          detail: { id: conversationId }
+        }));
       }
     } catch (error) {
       console.error("Error in handleSelectConversation:", error);
