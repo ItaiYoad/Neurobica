@@ -36,15 +36,18 @@ export function SidePanel({ isOpen, onOpenChange }: SidePanelProps) {
     
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
     const startedFromRightHalf = touchStart > window.innerWidth / 2;
     
     if (isLeftSwipe && startedFromRightHalf && !isOpen) {
       onOpenChange(true);
+    } else if (isRightSwipe && isOpen) {
+      onOpenChange(false);
     }
     
     setTouchStart(null);
     setTouchEnd(null);
-  }, [touchStart, touchEnd, isOpen]);
+  }, [touchStart, touchEnd, isOpen, onOpenChange]);
 
   useEffect(() => {
     if (isMobile && !isOpen) {
