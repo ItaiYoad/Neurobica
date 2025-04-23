@@ -82,8 +82,10 @@ export function ConversationList() {
     }
   };
   
-  const handleSelectConversation = async (conversationId: string) => {
+  const handleSelectConversation = async (conversation: Conversation) => {
+    const conversationId = conversation.id;
     console.log("🎯 Selecting conversation:", conversationId, "Current active:", activeConversationId);
+    console.log("🎯 Full conversation object:", conversation);
     
     try {
       if (conversationId !== activeConversationId) {
@@ -92,6 +94,7 @@ export function ConversationList() {
         // Reset any current conversation first if needed
         if (activeConversationId !== null) {
           // First set to null to clear any existing messages/state
+          console.log("🎯 Clearing current conversation first");
           await setActiveConversation(null);
           
           // Force a small delay for state to clear
@@ -99,14 +102,27 @@ export function ConversationList() {
         }
         
         // Now set the active conversation to the selected one
+        console.log("🎯 Setting new active conversation:", conversationId);
         await setActiveConversation(conversationId);
         
-        console.log("🎯 Conversation selection completed for:", conversationId);
+        // Immediately fetch messages for this conversation
+        console.log("🎯 Directly fetching messages for conversation", conversationId);
+        const response = await fetch(`/api/conversations/${conversationId}/messages`);
         
-        // Force a refresh of the component
+        if (!response.ok) {
+          throw new Error(`Failed to fetch messages: ${response.status}`);
+        }
+        
+        const messages = await response.json();
+        console.log("🎯 Directly fetched messages:", messages.length, messages);
+        
+        // Force a refresh of the component with the conversation ID
+        console.log("🎯 Dispatching conversation-selected event");
         window.dispatchEvent(new CustomEvent('conversation-selected', { 
-          detail: { id: conversationId }
+          detail: { id: conversationId, messages: messages }
         }));
+        
+        console.log("🎯 Conversation selection completed for:", conversationId);
       }
     } catch (error) {
       console.error("Error in handleSelectConversation:", error);
@@ -234,7 +250,7 @@ export function ConversationList() {
                       ? "bg-blue-100 text-blue-900"
                       : "hover:bg-gray-100 text-gray-900"
                   }`}
-                  onClick={() => handleSelectConversation(conversation.id)}
+                  onClick={() => handleSelectConversation(conversation)}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">

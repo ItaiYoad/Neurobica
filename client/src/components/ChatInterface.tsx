@@ -16,6 +16,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   
   const { 
     messages, 
+    setMessages, // Explicitly get setMessages from useChat
     sendMessage, 
     isLoading, 
     isLoadingMessages, 
@@ -27,13 +28,31 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
 
   // Listen for our custom conversation selection event
   useEffect(() => {
-    const handleConversationSelected = (event: CustomEvent<{id: string}>) => {
-      console.log("📣 Received conversation-selected event:", event.detail.id);
+    const handleConversationSelected = (event: CustomEvent<{id: string, messages: any[]}>) => {
+      console.log("📣 Received conversation-selected event for ID:", event.detail.id);
+      console.log("📣 Received conversation messages:", event.detail.messages);
       
-      // Force a refresh of messages
-      if (refetchMessages) {
-        console.log("📣 Forcing message refresh for conversation:", event.detail.id);
-        refetchMessages();
+      if (event.detail.messages && event.detail.messages.length > 0) {
+        // Format messages properly for our component
+        const formattedMessages = event.detail.messages.map((msg: any) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          timestamp: new Date(msg.timestamp).getTime(),
+          emotionalContext: msg.emotionalContext || null,
+          memoryTrigger: msg.memoryTrigger || null,
+          conversationId: msg.conversationId
+        }));
+        
+        // Directly set messages from the event
+        console.log("📣 Setting messages directly from event:", formattedMessages.length);
+        setMessages([...formattedMessages]); // Make a new array to force re-render
+      } else {
+        // Force a refresh of messages via refetchMessages if available
+        if (refetchMessages) {
+          console.log("📣 No messages in event, forcing refresh for conversation:", event.detail.id);
+          refetchMessages();
+        }
       }
     };
     
@@ -43,7 +62,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
     return () => {
       window.removeEventListener('conversation-selected', handleConversationSelected as any);
     };
-  }, [refetchMessages]);
+  }, [refetchMessages, setMessages]);
   
   // Listen for the localStorage flag we set in the new chat handler
   useEffect(() => {
@@ -115,9 +134,18 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
 
   // Debug logging
   useEffect(() => {
-    console.log("ChatInterface - Active conversation changed:", activeConversation);
-    console.log("ChatInterface - Active conversation ID:", activeConversationId);
-    console.log("ChatInterface - Message count:", messages.length);
+    console.log("💬 ChatInterface - Current conversation state:", {
+      conversation: activeConversation,
+      id: activeConversationId,
+      messageCount: messages.length
+    });
+    
+    if (messages.length > 0) {
+      console.log("💬 First message:", messages[0]);
+      console.log("💬 Last message:", messages[messages.length - 1]);
+    } else {
+      console.log("💬 No messages available");
+    }
   }, [activeConversation, activeConversationId, messages]);
 
   // Determine what to show based on messages, loading state, and active conversation

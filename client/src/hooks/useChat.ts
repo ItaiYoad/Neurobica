@@ -240,6 +240,7 @@ export function useChat() {
 
   return {
     messages,
+    setMessages, // Expose setMessages for direct manipulation
     notifications,
     sendMessage,
     startNewConversation,
