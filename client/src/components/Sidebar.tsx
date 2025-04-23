@@ -88,19 +88,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
       )}
 
-      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-between">
-        {!minimized && (
-          <div className="text-sm font-semibold text-primary">
-            Conversations
-          </div>
-        )}
+      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-end">
         <div className="flex items-center">
-          {!minimized && (
-            <Button variant="outline" size="sm" className="mr-2">
-              <PlusCircle className="h-4 w-4 mr-1" />
-              <span>New Chat</span>
-            </Button>
-          )}
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <PlusCircle className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
