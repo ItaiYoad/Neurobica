@@ -102,9 +102,9 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
           </div>
           <div className="relative">
             <img
-              src="./Neurobica logo full.png"
+              src="/attached_assets/Neurobica logo full.png"
               alt="Neurobica"
-              className="fixed right-4 bottom-4 h-5 opacity-30 z-10"
+              className="fixed right-4 bottom-4 h-5 opacity-30 z-10 pointer-events-none"
             />
             <ChatInput
               onSendMessage={handleSendMessage}
