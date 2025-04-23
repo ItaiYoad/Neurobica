@@ -10,19 +10,9 @@ export function useChat() {
   const [isLoading, setIsLoading] = useState(false);
   const { currentEmotionalState, sendMessage: sendWebSocketMessage, lastMessage } = useBiometrics();
 
-  // Initialize with a welcome message
+  // Initialize with empty messages
   useEffect(() => {
-    const welcomeMessage: Message = {
-      id: nanoid(),
-      role: "assistant",
-      content: "Hello! I'm your Neurobica assistant. I can adapt to your emotional state and help organize your life. How are you feeling today?",
-      timestamp: Date.now(),
-      emotionalContext: currentEmotionalState ? 
-        `I'm currently detecting that you're in a ${currentEmotionalState.label.toLowerCase()} state.` : 
-        undefined
-    };
-
-    setMessages([welcomeMessage]);
+    setMessages([]);
   }, []);
 
   // Listen for incoming websocket messages (notifications, etc.)
