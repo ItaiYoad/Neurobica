@@ -88,27 +88,27 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
       )}
 
-      <div className="flex-none py-8 px-4 border-b border-gray-200 flex items-center justify-end relative">
+      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-end relative">
         <Button
           variant="outline"
           size="icon"
-          className="absolute right-[25px] h-8 w-8"
+          className="absolute right-[25px]"
           onClick={() => {
             /* Your new chat logic */
           }}
         >
-          <PlusCircle className="h-3.5 w-3.5" />
+          <PlusCircle className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleMinimize}
-          className="absolute -right-4 top-1/2 -translate-y-1/2 rounded-full border shadow-sm bg-white z-10 h-8 w-8"
+          className="absolute -right-6 top-1/2 -translate-y-1/2 rounded-full border shadow-sm bg-white z-10"
         >
           {minimized ? (
-            <ChevronRight className="h-3.5 w-3.5" />
+            <ChevronRight className="h-4 w-4" />
           ) : (
-            <ChevronLeft className="h-3.5 w-3.5" />
+            <ChevronLeft className="h-4 w-4" />
           )}
         </Button>
       </div>
