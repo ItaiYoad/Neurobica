@@ -1,4 +1,3 @@
-
 import { ScrollArea } from "./ui/scroll-area";
 import { BiometricChart } from "./biometrics/BiometricChart";
 import { LifeScheduler } from "./scheduler/LifeScheduler";
@@ -24,7 +23,7 @@ export function SidePanel({ isOpen, onOpenChange }: SidePanelProps) {
   const bind = useDrag(({ swipe: [swipeX], movement: [mx], direction: [dx], cancel, last }) => {
     if (swipeX === 1 && !isOpen) onOpenChange(true);  // Swipe Right to open
     if (swipeX === -1 && isOpen) onOpenChange(false); // Swipe Left to close
-    
+
     if (last) {
       if (!isOpen && dx > 0.5) onOpenChange(true);
       else if (isOpen && dx < -0.5) onOpenChange(false);
@@ -34,7 +33,9 @@ export function SidePanel({ isOpen, onOpenChange }: SidePanelProps) {
   }, {
     axis: 'x',
     threshold: 15,
-    swipeDistance: [30, 30],
+    swipe: { 
+      distance: [50, 50] 
+    },
   });
 
   const content = (

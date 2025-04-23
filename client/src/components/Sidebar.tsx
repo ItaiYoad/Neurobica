@@ -25,7 +25,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   }, {
     axis: 'x',
     threshold: 15,
-    swipeDistance: [30, 30],
+    swipe: { 
+      distance: [50, 50] 
+    },
   });
 
   return (
