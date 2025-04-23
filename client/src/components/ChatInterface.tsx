@@ -1,3 +1,4 @@
+import { ChatHeader } from "./chat/ChatHeader";
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
@@ -7,8 +8,13 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
-  const { messages, notifications, sendMessage, isLoading, emotionalState } =
-    useChat();
+  const { 
+    messages, 
+    notifications,
+    sendMessage, 
+    isLoading, 
+    emotionalState 
+  } = useChat();
 
   const handleSendMessage = (content: string) => {
     sendMessage(content);
@@ -16,11 +22,12 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
 
   return (
     <div className="flex-1 flex flex-col">
+      <ChatHeader toggleSidebar={toggleSidebar} emotionalState={emotionalState} />
       <div className="flex-1 overflow-hidden">
-        <ChatMessages
-          messages={messages}
-          notifications={notifications}
-          isLoading={isLoading}
+        <ChatMessages 
+          messages={messages} 
+          notifications={notifications} 
+          isLoading={isLoading} 
         />
       </div>
       <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />

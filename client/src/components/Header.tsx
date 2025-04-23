@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NeurobicaLogoFull from "@assets/Neurobica logo full.png";
-import { Menu, User, LogOut, Settings, HelpCircle, Bell, Search } from "lucide-react";
+import { Menu, User, LogOut, Settings, HelpCircle, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -43,17 +43,19 @@ export function Header({ toggleSidebar }: HeaderProps) {
 
   return (
     <header className="bg-white border-b border-gray-200 py-3 px-4 flex items-center justify-between shadow-sm">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center space-x-2">
+        {/* Mobile sidebar toggle */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="md:hidden mr-2" 
+          onClick={toggleSidebar}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        
+        <div className="flex items-center">
           <img src={NeurobicaLogoFull} alt="Neurobica" className="h-8" />
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8" 
-            onClick={toggleSidebar}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
         </div>
         <span className="text-xs bg-purple-400 text-white px-2 py-0.5 rounded-full">
           POC
@@ -90,7 +92,7 @@ export function Header({ toggleSidebar }: HeaderProps) {
                 Stay up to date with biometric and system updates
               </SheetDescription>
             </SheetHeader>
-
+            
             <ScrollArea className="h-[calc(100vh-200px)]">
               {notifications.length > 0 ? (
                 notifications.map(notification => (
@@ -105,7 +107,7 @@ export function Header({ toggleSidebar }: HeaderProps) {
                       </span>
                     </div>
                     <p className="text-sm text-neutral-600 mb-2">{notification.message}</p>
-
+                    
                     {notification.options && (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {notification.options.map(option => (
@@ -128,7 +130,7 @@ export function Header({ toggleSidebar }: HeaderProps) {
                 </div>
               )}
             </ScrollArea>
-
+            
             <SheetFooter className="flex gap-2 p-4 border-t">
               <SheetClose asChild>
                 <Button variant="outline" onClick={markAllAsRead}>Close</Button>
