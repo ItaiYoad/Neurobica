@@ -153,10 +153,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create or get conversation
       let currentConversationId = conversationId;
       if (!currentConversationId) {
+        // Generate a title for the new conversation
+        const title = await chatHandler.generateTitle(message);
+        
         // Create a new conversation if none provided
         const newConversation = await storage.createConversation({
           id: nanoid(),
-          title: "New Conversation", // Will be updated after first message
+          title,
           userId: null,
           summary: null,
           emotionalTag: emotionalState && emotionalState.label ? emotionalState.label : null,
