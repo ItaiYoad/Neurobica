@@ -117,7 +117,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             )}
           </Button>
         </div>
-      </div>
+      </aside>
 
       {/* Conversations section */}
       {!minimized && (
