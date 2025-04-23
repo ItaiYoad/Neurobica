@@ -1,93 +1,119 @@
+// services/openai.ts
 import OpenAI from "openai";
 import { EmotionalState } from "@/types";
 import { nanoid } from "nanoid";
 import { storage } from "../storage";
 
 // Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// System prompt with capabilities description
+// Enhanced system prompt reflecting Neurobica's vision and capabilities
 const SYSTEM_PROMPT = `
-You are an emotionally adaptive AI assistant for the Neurobica platform. 
-Your responses should adjust based on the user's emotional state provided in the context.
+You are Neurobica, an emotionally adaptive AI assistant combining real-time biometric insights with advanced language understanding.
 
-You have these capabilities:
-1. Adapt your tone and responses based on the user's emotional state (Calm, Stressed, Focused, etc.)
-2. When user mentions anything about their life that could be scheduled or remembered, extract and store that information
-3. Offer appropriate suggestions based on the user's current emotional state (breathing exercises when stressed, etc.)
-4. Recall previously stored information about the user when relevant
-
-When responding:
-- If user is calm: Be conversational and positive
-- If user is stressed: Be gentle, composed, and offer stress-reduction techniques
-- If user is focused: Be concise and direct, avoid unnecessary chatter
-- Always acknowledge the emotional state when it changes significantly
-
-Remember: You're part of a POC system that demonstrates how AI can adapt to real-time biometric signals.
+Capabilities:
+1. Adjust tone and style based on the user's emotional state (Calm, Stressed, Focused, Fatigued).
+2. Extract, remember, and schedule life details: routines, reminders, goals, and preferences.
+3. Offer personalized suggestions: mindfulness exercises, stress-relief techniques, productivity tips.
+4. Recall previously stored user information when relevant.
+5. Serve as a wellness coach, mindful companion, and cognitive assistant, guiding the user's day with empathy.
 `;
 
-/**
- * Process a chat message with emotional context
- */
+// Main chat handler
 export async function chatHandler(
   message: string,
-  emotionalState?: EmotionalState
+  emotionalState?: EmotionalState,
 ): Promise<{ message: string; emotionalContext?: string }> {
   try {
-    // Create emotionalContext tag for prompt injection
-    let emotionalContext = "";
-    
-    if (emotionalState) {
-      emotionalContext = `[Emotion: ${emotionalState.label}, Level: ${emotionalState.level}/100]`;
-      
-      // Log the prompt injection
+    // Build emotional context snippet
+    const emotionalContext = emotionalState
+      ? `[Emotion: ${emotionalState.label}, Level: ${emotionalState.level}/100]`
+      : "";
+
+    // Log prompt injection
+    if (emotionalContext) {
       await storage.createLog({
         id: nanoid(),
         type: "prompt",
         message: `Prompt injection: ${emotionalContext}`,
-        data: { emotionalState }
+        data: { emotionalContext },
       });
     }
-    
-    // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+
+    // Call OpenAI
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
       messages: [
-        { role: "system" as const, content: SYSTEM_PROMPT },
-        // If we have emotional context, insert it before the user message
-        ...(emotionalContext ? [{ role: "system" as const, content: emotionalContext }] : []),
-        { role: "user" as const, content: message }
+        { role: "system", content: SYSTEM_PROMPT + emotionalContext },
+        { role: "user", content: message },
       ],
-      temperature: 0.7,
-      max_tokens: 500
+      temperature: 0.8,
+      max_tokens: 300,
     });
-    
-    const responseContent = response.choices[0].message.content || "I'm sorry, I couldn't process that.";
-    
-    // Return with emotional context if available
-    return {
-      message: responseContent,
-      emotionalContext: emotionalState ? 
-        `Responding to detected ${emotionalState.label.toLowerCase()}` : 
-        undefined
-    };
-  } catch (error: any) {
+
+    const aiMessage = completion.choices[0]?.message?.content.trim() || "";
+
+    // Log AI response
+    await storage.createLog({
+      id: nanoid(),
+      type: "response",
+      message: aiMessage,
+      data: completion.toJSON(),
+    });
+
+    return { message: aiMessage };
+  } catch (error) {
     console.error("OpenAI API error:", error);
-    
-    // Log the error
     await storage.createLog({
       id: nanoid(),
       type: "alert",
-      message: `OpenAI API error: ${error.message || 'Unknown error'}`,
-      data: { error: error.toString() }
+      message: `OpenAI API error: ${error.message || "Unknown error"}`,
+      data: { error: error.toString() },
     });
-    
-    // Return a fallback message
     return {
-      message: "I'm having trouble connecting to my thinking system. Could you please try again in a moment?",
-      emotionalContext: "System error"
+      message:
+        "I'm having trouble connecting to my thinking system. Could you please try again in a moment?",
+      emotionalContext: "System error",
     };
+  }
+}
+
+// Generate a chat title of 3–6 words upon conversation creation
+export async function generateChatTitle(): Promise<string> {
+  try {
+    const resp = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are Neurobica's title generator. Create a succinct, 3-to-6-word title that reflects an empathetic mental wellness chat experience.",
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 12,
+    });
+
+    const raw = resp.choices[0]?.message?.content.trim() || "";
+    const title = raw.replace(/^"|"$/g, "");
+
+    // Log generated title
+    await storage.createLog({
+      id: nanoid(),
+      type: "title",
+      message: `Generated chat title: ${title}`,
+      data: { title },
+    });
+
+    return title;
+  } catch (error) {
+    console.error("Error generating chat title:", error);
+    await storage.createLog({
+      id: nanoid(),
+      type: "alert",
+      message: `Chat title generation error: ${error.message}`,
+      data: { error: error.toString() },
+    });
+    return "Mindful Conversation";
   }
 }
