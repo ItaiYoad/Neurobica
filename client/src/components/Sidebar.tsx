@@ -1,7 +1,20 @@
+import { BiometricSourceCard } from "./biometrics/BiometricSourceCard";
+import { EmotionStateCard } from "./biometrics/EmotionStateCard";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { PanelLeft, Search, PlusCircle } from "lucide-react";
+import { useBiometrics } from "@/context/BiometricsContext";
 import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import {
+  PlusCircle,
+  ChevronLeft,
+  ChevronRight,
+  MessageSquare,
+  BarChart3,
+  Calendar,
+  List,
+  Settings,
+  Cog,
+} from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,91 +24,117 @@ interface SidebarProps {
 interface ConversationItem {
   id: string;
   title: string;
-  icon?: string;
+  date: string;
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
-  const [conversations] = useState<ConversationItem[]>([
-    { id: "1", title: "ChatGPT", icon: "🤖" },
-    { id: "2", title: "Sora", icon: "🌌" },
-    { id: "3", title: "Socratest", icon: "🧠" },
-    { id: "4", title: "ThemAI", icon: "🎨" },
-    { id: "5", title: "Productor GPT", icon: "⚡" },
-    { id: "6", title: "BrainStormerIL", icon: "💡" },
-    { id: "7", title: "QuotAI", icon: "📝" },
-    { id: "8", title: "Neuroscience", icon: "🧪" },
-    { id: "9", title: "Neurotester", icon: "🔬" },
+  const { biometricSources, emotionalStates } = useBiometrics();
+  const [minimized, setMinimized] = useState(false);
+  const [conversations, setConversations] = useState<ConversationItem[]>([
+    { id: "1", title: "Morning Planning Session", date: "Today" },
+    { id: "2", title: "Workout Goals", date: "Yesterday" },
+    { id: "3", title: "Meeting Preparation", date: "3 days ago" },
   ]);
 
-  if (!isOpen) {
+  const toggleMinimize = () => {
+    setMinimized(!minimized);
+  };
+
+  // Just showing the icon for navigation links when minimized
+  const renderNavLink = (
+    href: string,
+    icon: React.ReactNode,
+    label: string,
+  ) => {
+    const isActive = location === href;
+    const baseClasses =
+      "flex items-center px-3 py-2 text-sm rounded-md transition-colors";
+    const activeClasses = "bg-primary text-white";
+    const inactiveClasses = "text-neutral-dark hover:bg-neutral-light";
+
     return (
-      <div className="fixed top-16 left-0 p-2 flex flex-col gap-2 border-r border-gray-200 bg-white">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={onClose}
+      <Link href={href}>
+        <div
+          className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses} cursor-pointer`}
         >
-          <PanelLeft className="h-4 w-4" />
-        </Button>
+          <span className="mr-3">{icon}</span>
+          {!minimized && <span>{label}</span>}
+        </div>
+      </Link>
+    );
+  };
+
+  return (
+    <aside
+      className={`
+        relative flex flex-col
+        ${isOpen ? "fixed z-50 top-16 left-0 h-[calc(100vh-4rem)]" : "hidden"} 
+        ${minimized ? "w-16" : "w-64"} 
+        md:flex md:static md:z-auto md:h-full
+        bg-white border-r border-gray-200 transition-all duration-300
+      `}
+    >
+      {isOpen && (
+        <div className="md:hidden absolute top-3 right-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="rounded-full"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-end relative">
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
-          className="h-8 w-8"
-          onClick={() => {/* New chat logic */}}
+          className="absolute right-[25px]"
+          onClick={() => {
+            /* Your new chat logic */
+          }}
         >
           <PlusCircle className="h-4 w-4" />
         </Button>
-      </div>
-    );
-  }
-
-  return (
-    <aside className="fixed z-50 top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 flex flex-col md:static md:z-auto">
-      <div className="flex items-center justify-between p-2 border-b border-gray-200">
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
-          onClick={onClose}
+          onClick={toggleMinimize}
+          className="absolute -right-6 top-1/2 -translate-y-1/2 rounded-full border shadow-sm bg-white z-10"
         >
-          <PanelLeft className="h-4 w-4" />
+          {minimized ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
         </Button>
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => {/* Search logic */}}
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => {/* New chat logic */}}
-          >
-            <PlusCircle className="h-4 w-4" />
-          </Button>
-        </div>
       </div>
 
-      <div className="flex-grow overflow-y-auto p-2">
-        <div className="space-y-1">
-          {conversations.map((conversation) => (
-            <Button
-              key={conversation.id}
-              variant="ghost"
-              className="w-full justify-start font-normal h-auto text-left"
-            >
-              <span className="mr-2">{conversation.icon}</span>
-              <span className="truncate">{conversation.title}</span>
-            </Button>
-          ))}
+      {/* Conversations section */}
+      {!minimized && (
+        <div className="flex-grow overflow-y-auto p-2">
+          <div className="space-y-1">
+            {conversations.map((conversation) => (
+              <Button
+                key={conversation.id}
+                variant="ghost"
+                className="w-full justify-start font-normal py-2 px-3 h-auto text-left"
+              >
+                <MessageSquare className="h-4 w-4 mr-2 flex-shrink-0" />
+                <div className="truncate">
+                  <div className="text-sm truncate">{conversation.title}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {conversation.date}
+                  </div>
+                </div>
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </aside>
   );
 }
