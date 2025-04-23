@@ -41,7 +41,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     setMinimized(!minimized);
   };
 
-  // Just showing the icon for navigation links when minimized
   const renderNavLink = (
     href: string,
     icon: React.ReactNode,
@@ -76,19 +75,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         bg-white border-r border-gray-200
       `}
     >
-      {isOpen && (
-        <div className="md:hidden absolute top-3 right-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="rounded-full"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
       <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-between">
         <Button variant="ghost" size="icon" className="rounded-full">
           <PlusCircle className="h-4 w-4" />
@@ -109,16 +95,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           onClick={toggleMinimize}
           className="hidden md:flex rounded-full"
         >
-            {minimized ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
+          {minimized ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
       </div>
 
-      {/* Conversations section */}
       {!minimized && (
         <div className="flex-grow overflow-y-auto p-2">
           <div className="space-y-1">
