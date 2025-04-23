@@ -34,18 +34,24 @@ export function useChat() {
         try {
           const conversationMessages = await getMessages(activeConversationId);
           // Convert to the expected Message format
-          const formattedMessages = conversationMessages.map((msg: any) => ({
-            id: msg.id,
-            role: msg.role,
-            content: msg.content,
-            timestamp: new Date(msg.timestamp).getTime(),
-            emotionalContext: msg.emotionalContext,
-            memoryTriggerId: msg.memoryTriggerId,
-            conversationId: msg.conversationId
-          }));
-          setMessages(formattedMessages);
+          if (Array.isArray(conversationMessages)) {
+            const formattedMessages = conversationMessages.map((msg: any) => ({
+              id: msg.id,
+              role: msg.role,
+              content: msg.content,
+              timestamp: new Date(msg.timestamp).getTime(),
+              emotionalContext: msg.emotionalContext || null,
+              memoryTrigger: msg.memoryTrigger || null,
+              conversationId: msg.conversationId
+            }));
+            setMessages(formattedMessages);
+          } else {
+            console.error("Received non-array message data:", conversationMessages);
+            setMessages([]);
+          }
         } catch (error) {
           console.error("Error loading messages:", error);
+          setMessages([]);
         } finally {
           setIsLoadingMessages(false);
         }
@@ -94,7 +100,7 @@ export function useChat() {
           break;
       }
     }
-  }, [lastMessage, activeConversationId, messages, setActiveConversation]);
+  }, [lastMessage, activeConversationId, setActiveConversation]);
 
   // Start a new conversation
   const startNewConversation = async () => {

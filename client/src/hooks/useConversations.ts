@@ -79,10 +79,13 @@ export function useConversations() {
 
   // Set active conversation and return its data
   const setActiveConversation = (id: string | null) => {
-    setActiveConversationId(id);
-    
-    if (id) {
-      return conversations.find(c => c.id === id) || null;
+    // Prevent unnecessary re-renders
+    if (id !== activeConversationId) {
+      setActiveConversationId(id);
+      
+      if (id) {
+        return conversations.find(c => c.id === id) || null;
+      }
     }
     
     return null;

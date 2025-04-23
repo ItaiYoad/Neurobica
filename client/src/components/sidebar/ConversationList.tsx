@@ -57,7 +57,9 @@ export function ConversationList() {
   };
   
   const handleSelectConversation = (conversationId: string) => {
-    setActiveConversation(conversationId);
+    if (conversationId !== activeConversationId) {
+      setActiveConversation(conversationId);
+    }
   };
   
   const handleRenameClick = (conversation: Conversation) => {
