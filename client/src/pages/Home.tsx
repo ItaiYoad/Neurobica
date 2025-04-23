@@ -20,7 +20,7 @@ export default function Home() {
         {!mobileSidebarOpen && (
           <button 
             onClick={() => setMobileSidebarOpen(true)}
-            className="absolute top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md hover:bg-gray-50"
+            className="absolute top-[4.5rem] left-4 z-50 p-2 rounded-lg bg-white shadow-md hover:bg-gray-50"
           >
             <Menu className="h-5 w-5" />
           </button>
