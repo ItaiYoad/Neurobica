@@ -85,12 +85,13 @@ export async function setupWebSocketHandlers(wss: WebSocketServer) {
       console.log(`WebSocket client disconnected. Total clients: ${clients.size}`);
     });
     
-    // Send welcome notification only once
-    const hasWelcomeKey = `welcomed_${Date.now()}`;
-    if (!global[hasWelcomeKey]) {
-      global[hasWelcomeKey] = true;
-      setTimeout(() => {
-        if (ws.readyState === WebSocket.OPEN) {
+    // Send welcome notification only once per client
+    const clientId = nanoid();
+    ws.clientId = clientId;
+    
+    setTimeout(() => {
+      // Check if this specific client is still connected
+      if (ws.readyState === WebSocket.OPEN && ws.clientId === clientId) {
           ws.send(JSON.stringify({
             type: "notification",
             data: {
