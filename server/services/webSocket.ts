@@ -85,25 +85,29 @@ export async function setupWebSocketHandlers(wss: WebSocketServer) {
       console.log(`WebSocket client disconnected. Total clients: ${clients.size}`);
     });
     
-    // Send welcome notification
-    setTimeout(() => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-          type: "notification",
-          data: {
-            id: nanoid(),
-            type: NotificationType.FeedbackLoop,
-            title: "Welcome to Neurobica",
-            message: "I'll adapt to your emotional state as we interact. How are you feeling today?",
-            options: [
-              { label: "I'm feeling calm", action: "respond_calm" },
-              { label: "I'm a bit stressed", action: "respond_stressed" }
-            ],
-            timestamp: Date.now()
-          }
-        }));
-      }
-    }, 2000);
+    // Send welcome notification only once
+    const hasWelcomeKey = `welcomed_${Date.now()}`;
+    if (!global[hasWelcomeKey]) {
+      global[hasWelcomeKey] = true;
+      setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: "notification",
+            data: {
+              id: nanoid(),
+              type: NotificationType.FeedbackLoop,
+              title: "Welcome to Neurobica",
+              message: "I'll adapt to your emotional state as we interact. How are you feeling today?",
+              options: [
+                { label: "I'm feeling calm", action: "respond_calm" },
+                { label: "I'm a bit stressed", action: "respond_stressed" }
+              ],
+              timestamp: Date.now()
+            }
+          }));
+        }
+      }, 2000);
+    }
   });
   
   // Only set up biometric simulation if NeurospeedOS service is not available
