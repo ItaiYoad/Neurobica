@@ -13,7 +13,7 @@ export default function Home() {
 
   return (
     <div className="font-sans bg-neutral-lighter text-neutral-dark h-screen flex flex-col pt-14">
-      <Header toggleSidebar={toggleMobileSidebar} />
+      <Header toggleSidebar={toggleMobileSidebar} isSidebarOpen={mobileSidebarOpen} />
 
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
