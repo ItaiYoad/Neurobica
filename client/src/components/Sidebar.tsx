@@ -56,7 +56,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   }
 
   return (
-    <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white border-r flex flex-col">
+    <aside className="h-[calc(100vh-4rem)] w-64 bg-white border-r flex flex-col">
       <div className="p-2 flex items-center justify-between border-b">
         <Button
           variant="ghost"
