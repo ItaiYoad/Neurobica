@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SystemLogs } from "@/components/logs/SystemLogs"; // Assuming this import is correct
 
 export function Header() {
   return (
@@ -35,6 +36,9 @@ export function Header() {
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Log out</DropdownMenuItem>
+            <DropdownMenuItem>
+              <SystemLogs />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

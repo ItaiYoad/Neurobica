@@ -47,12 +47,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </Button>
       </div>
 
-      <div className="overflow-y-auto h-[calc(100vh-56px)]">
-        {conversations.map((conversation) => (
-          <div key={conversation.id} className="p-2">
-            {/* Conversation items will go here */}
-          </div>
-        ))}
+      <div className="flex flex-col h-[calc(100vh-56px)]">
+        <div className="flex-1 overflow-y-auto">
+          {conversations.map((conversation) => (
+            <div key={conversation.id} className="p-2">
+              {/* Conversation items will go here */}
+            </div>
+          ))}
+        </div>
+        <div className="border-t">
+          <LifeScheduler />
+        </div>
       </div>
     </aside>
   );
