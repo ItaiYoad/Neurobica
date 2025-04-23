@@ -1,21 +1,16 @@
-import { useState } from "react";
+
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
 import { Button } from "./ui/button";
 import { Search, Wand2 } from "lucide-react";
-import { useBiometrics } from "@/context/BiometricsContext";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { BiometricChart } from "./biometrics/BiometricChart";
-import NeurobicaLogo from "@assets/Neurobica logo full.png";
+
 interface ChatInterfaceProps {
   toggleSidebar: () => void;
 }
 
 export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   const { messages, sendMessage, isLoading } = useChat();
-  const [showBiometrics, setShowBiometrics] = useState(false);
-  const { biometricData } = useBiometrics();
 
   const handleSendMessage = (content: string) => {
     sendMessage(content);
@@ -23,126 +18,39 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
 
   const suggestions = [
     { icon: Search, text: "Search the web" },
-    { icon: Wand2, text: "Generate creative ideas" },
+    { icon: Wand2, text: "Generate creative ideas" }
   ];
 
   return (
     <div className="flex-1 flex flex-col h-screen">
-      <div className="flex-1 flex flex-col h-full relative">
-        {messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center px-4 max-w-3xl mx-auto w-full">
-            <h1 className="text-4xl font-bold mb-8 text-center">What are you working on?</h1>
-            <div className="w-full">
-              <div className="flex flex-col gap-4">
-                <div className="relative">
-                  <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
-                </div>
-                <div className="flex justify-center gap-2 mt-2">
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Search className="w-4 h-4" />
-                    Search
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Wand2 className="w-4 h-4" />
-                    Deep research
-                  </Button>
-                </div>
-              </div>
-            </div>
+      {messages.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center p-4">
+          <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
+          <div className="flex flex-wrap justify-center gap-4 max-w-xl">
+            {suggestions.map((suggestion, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="h-12 px-6 flex items-center gap-2"
+                onClick={() => handleSendMessage(suggestion.text)}
+              >
+                <suggestion.icon className="h-5 w-5" />
+                {suggestion.text}
+              </Button>
+            ))}
           </div>
-        ) : (
-          <div className="flex-1 overflow-hidden">
-            <div className="h-full pb-32">
-              <ChatMessages messages={messages} isLoading={isLoading} />
-            </div>
-          </div>
-        )}
-        <div className="absolute bottom-0 left-0 right-0 bg-white">
-          <div className="max-w-3xl mx-auto px-4 py-4">
+          <div className="w-full max-w-3xl mt-8">
             <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
           </div>
         </div>
-      </div>
-
-      <div className="absolute bottom-32 left-4 bg-white/60 p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white/80 transition-all duration-300 z-10">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="p-1 border rounded-lg">
-            <div className="text-xs text-gray-500">Heart Rate</div>
-            <div className="text-lg font-semibold text-red-500">
-              {biometricData.heartRate} bpm
-            </div>
-          </div>
-          <div className="p-1 border rounded-lg">
-            <div className="text-xs text-gray-500">EEG Alpha</div>
-            <div className="text-lg font-semibold text-green-500">
-              {biometricData.eegAlpha.toFixed(1)} μV
-            </div>
-          </div>
-        </div>
-      </div>
-      <Dialog open={showBiometrics} onOpenChange={setShowBiometrics}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Biometric Data</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <BiometricChart data={biometricData} className="w-full h-64" />
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 border rounded-lg">
-                <div className="text-sm text-gray-500">Heart Rate</div>
-                <div className="text-2xl font-semibold">
-                  {biometricData.heartRate} bpm
-                </div>
-              </div>
-              <div className="p-4 border rounded-lg">
-                <div className="text-sm text-gray-500">EEG Alpha</div>
-                <div className="text-2xl font-semibold">
-                  {biometricData.eegAlpha.toFixed(1)} μV
-                </div>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <img
-        src={NeurobicaLogo}
-        alt="Neurobica"
-        className="fixed right-4 bottom-4 h-5 opacity-30 z-10 pointer-events-none"
-      />
-      <div className="flex-1 flex flex-col h-full relative">
-        {messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-4">
-            <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
-            <div className="flex flex-wrap justify-center gap-4 max-w-xl">
-              {suggestions.map((suggestion, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className="h-12 px-6 flex items-center gap-2"
-                  onClick={() => handleSendMessage(suggestion.text)}
-                >
-                  <suggestion.icon className="h-5 w-5" />
-                  {suggestion.text}
-                </Button>
-              ))}
-            </div>
-          </div>
-        ) : (
+      ) : (
+        <>
           <div className="flex-1 overflow-hidden">
-            <div className="h-full pb-32">
-              <ChatMessages messages={messages} isLoading={isLoading} />
-            </div>
+            <ChatMessages messages={messages} isLoading={isLoading} />
           </div>
-        )}
-        <div className="absolute bottom-0 left-0 right-0 bg-white">
-          <div className="max-w-3xl mx-auto px-4 py-4">
-            <ChatInput
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-            />
-          </div>
-        </div>
-      </div>
+          <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+        </>
+      )}
     </div>
   );
 }

@@ -2,10 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Menu, PlusCircle, Search } from "lucide-react";
-import { LifeScheduler } from "./scheduler/LifeScheduler";
-import { useBiometrics } from "@/context/BiometricsContext";
-import { useSystemLogs } from "@/hooks/useSystemLogs";
-import { useLifeScheduler } from "@/hooks/useLifeScheduler";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -13,13 +9,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const [memoryItems, setMemoryItems] = useState([]);
-  const { logs } = useSystemLogs();
-  const { biometricData } = useBiometrics();
-
-  const addMemoryItem = (item: any) => {
-    setMemoryItems([...memoryItems, item]);
-  };
   const [conversations] = useState([]);
 
   return (
@@ -27,7 +16,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       className={`
         fixed top-0 left-0 h-screen w-[260px] bg-white border-r border-gray-200
         transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         z-50
       `}
     >
@@ -41,26 +30,29 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <Menu className="h-5 w-5" />
         </Button>
 
-        <Button variant="ghost" size="icon" className="h-9 w-9">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9"
+        >
           <Search className="h-5 w-5" />
         </Button>
 
-        <Button variant="ghost" size="icon" className="h-9 w-9 ml-auto">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 ml-auto"
+        >
           <PlusCircle className="h-5 w-5" />
         </Button>
       </div>
 
-      <div className="flex flex-col h-[calc(100vh-56px)]">
-        <div className="flex-1 overflow-y-auto">
-          {conversations.map((conversation) => (
-            <div key={conversation.id} className="p-2">
-              {/* Conversation items will go here */}
-            </div>
-          ))}
-        </div>
-        <div className="border-t">
-          <LifeScheduler />
-        </div>
+      <div className="overflow-y-auto h-[calc(100vh-56px)]">
+        {conversations.map((conversation) => (
+          <div key={conversation.id} className="p-2">
+            {/* Conversation items will go here */}
+          </div>
+        ))}
       </div>
     </aside>
   );

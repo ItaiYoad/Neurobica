@@ -1,28 +1,26 @@
-import { useState } from "react";
-import { Menu } from "lucide-react";
 import { Header } from "@/components/Header";
-import { useBiometrics } from "@/context/BiometricsContext";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
-import { BiometricChart } from "@/components/biometrics/BiometricChart";
+import { SidePanel } from "@/components/SidePanel";
+import { useState } from "react";
 
 export default function Home() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { emotionalState } = useBiometrics();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+  const toggleMobileSidebar = () => {
+    setMobileSidebarOpen(!mobileSidebarOpen);
   };
 
   return (
     <div className="font-sans bg-neutral-lighter text-neutral-dark h-screen flex flex-col">
-      <Header toggleSidebar={toggleSidebar} showMenuButton={true} emotionalState={emotionalState} />
+      <Header toggleSidebar={toggleMobileSidebar} />
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        
-        <main className={`flex-1 flex overflow-hidden transition-all duration-300 ${sidebarOpen ? 'ml-[260px]' : 'ml-0'}`}>
-          <ChatInterface toggleSidebar={toggleSidebar} />
+        <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
+
+        <main className="flex-1 flex overflow-hidden">
+          <ChatInterface toggleSidebar={toggleMobileSidebar} />
+          <SidePanel />
         </main>
       </div>
     </div>
