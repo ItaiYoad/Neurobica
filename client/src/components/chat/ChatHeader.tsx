@@ -10,7 +10,9 @@ export function ChatHeader({ toggleSidebar, emotionalState }: ChatHeaderProps) {
     <div className="bg-white p-4 border-b border-gray-200">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          
+          <button className="md:hidden text-gray-500" onClick={toggleSidebar}>
+            <i className="fas fa-bars"></i>
+          </button>
           <div>
             <h1 className="text-lg font-semibold">AI Assistant</h1>
             <div className="flex items-center text-sm text-neutral-mid">

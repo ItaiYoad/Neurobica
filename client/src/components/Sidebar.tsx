@@ -41,6 +41,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     setMinimized(!minimized);
   };
 
+  // Just showing the icon for navigation links when minimized
   const renderNavLink = (
     href: string,
     icon: React.ReactNode,
@@ -67,42 +68,55 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   return (
     <aside
       className={`
-        fixed z-50 top-16 flex flex-col h-[calc(100vh-4rem)]
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        ${minimized ? "w-16" : "w-64"}
-        md:transform-none md:flex md:static md:z-auto md:h-full
-        bg-white border-r border-gray-200
+        relative flex flex-col
+        ${isOpen ? "fixed z-50 top-16 left-0 h-[calc(100vh-4rem)]" : "hidden"} 
+        ${minimized ? "w-16" : "w-64"} 
+        md:flex md:static md:z-auto md:h-full
+        bg-white border-r border-gray-200 transition-all duration-300
       `}
     >
-      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-between">
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <PlusCircle className="h-4 w-4" />
-        </Button>
-        {isOpen && (
+      {isOpen && (
+        <div className="md:hidden absolute top-3 right-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="md:hidden rounded-full"
+            className="rounded-full"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
+        </div>
+      )}
+
+      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-between">
+        {!minimized && (
+          <div className="text-sm font-semibold text-primary">
+            Conversations
+          </div>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleMinimize}
-          className="hidden md:flex rounded-full"
-        >
-          {minimized ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
+        <div className="flex items-center">
+          {!minimized && (
+            <Button variant="outline" size="sm" className="mr-2">
+              <PlusCircle className="h-4 w-4 mr-1" />
+              <span>New Chat</span>
+            </Button>
           )}
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleMinimize}
+            className="md:flex hidden rounded-full"
+          >
+            {minimized ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
 
+      {/* Conversations section */}
       {!minimized && (
         <div className="flex-grow overflow-y-auto p-2">
           <div className="space-y-1">
