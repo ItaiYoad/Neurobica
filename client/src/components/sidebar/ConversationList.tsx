@@ -52,15 +52,20 @@ export function ConversationList() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newTitle, setNewTitle] = useState("");
   
-  const handleStartNewChat = useCallback(() => {
+  const handleStartNewChat = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Starting new conversation (from ConversationList)");
     startNewConversation();
-  }, [startNewConversation]);
+  };
   
-  const handleSelectConversation = useCallback((conversationId: string) => {
+  const handleSelectConversation = (conversationId: string) => {
+    console.log("Selecting conversation:", conversationId, "Current active:", activeConversationId);
     if (conversationId !== activeConversationId) {
+      console.log("Setting active conversation to:", conversationId);
       setActiveConversation(conversationId);
     }
-  }, [activeConversationId, setActiveConversation]);
+  };
   
   const handleRenameClick = useCallback((conversation: Conversation) => {
     setSelectedConversation(conversation);

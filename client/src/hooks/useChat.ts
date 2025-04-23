@@ -26,14 +26,21 @@ export function useChat() {
   } = useQuery({
     queryKey: ['conversationMessages', activeConversationId],
     queryFn: async () => {
-      if (!activeConversationId) return [];
+      console.log("Query function executing for conversation:", activeConversationId);
+      
+      if (!activeConversationId) {
+        console.log("No active conversation ID, returning empty array");
+        return [];
+      }
 
       try {
+        console.log("Fetching messages from API for:", activeConversationId);
         const response = await apiRequest('GET', `/api/conversations/${activeConversationId}/messages`);
         const data = await response.json();
+        console.log("API response for messages:", data);
 
         if (Array.isArray(data)) {
-          return data.map((msg: any) => ({
+          const formattedMessages = data.map((msg: any) => ({
             id: msg.id,
             role: msg.role,
             content: msg.content,
@@ -42,6 +49,8 @@ export function useChat() {
             memoryTrigger: msg.memoryTrigger || null,
             conversationId: msg.conversationId
           }));
+          console.log("Formatted messages:", formattedMessages.length);
+          return formattedMessages;
         } else {
           console.error("Received invalid message data:", data);
           return [];
@@ -56,9 +65,17 @@ export function useChat() {
 
   // When conversation messages data changes, update our messages state
   useEffect(() => {
+    console.log("Conversation messages state changed", {
+      activeConversationId,
+      hasMessages: conversationMessages.length > 0,
+      messageCount: conversationMessages.length
+    });
+    
     if (activeConversationId && conversationMessages) {
+      console.log("Setting messages for active conversation", activeConversationId);
       setMessages(conversationMessages);
     } else if (!activeConversationId) {
+      console.log("No active conversation, clearing messages");
       setMessages([]);
     }
   }, [activeConversationId, conversationMessages]);
@@ -116,6 +133,7 @@ export function useChat() {
 
   // Start a new conversation
   const startNewConversation = useCallback(() => {
+    console.log("Starting new conversation");
     setActiveConversation(null);
     setMessages([]);
   }, [setActiveConversation]);

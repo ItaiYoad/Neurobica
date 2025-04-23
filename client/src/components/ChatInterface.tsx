@@ -4,7 +4,7 @@ import { useChat } from "@/hooks/useChat";
 import { Button } from "./ui/button";
 import { Search, Wand2, Calendar, Brain, Clock, Heart, Sparkles } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 interface ChatInterfaceProps {
   toggleSidebar: () => void;
@@ -17,7 +17,8 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
     isLoading, 
     isLoadingMessages, 
     startNewConversation,
-    activeConversation 
+    activeConversation,
+    activeConversationId
   } = useChat();
 
   const handleSendMessage = useCallback((content: string) => {
@@ -61,6 +62,13 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
     { icon: Search, text: "Search the web" },
     { icon: Wand2, text: "Generate creative ideas" },
   ];
+
+  // Debug logging
+  useEffect(() => {
+    console.log("ChatInterface - Active conversation changed:", activeConversation);
+    console.log("ChatInterface - Active conversation ID:", activeConversationId);
+    console.log("ChatInterface - Message count:", messages.length);
+  }, [activeConversation, activeConversationId, messages]);
 
   // Determine what to show based on messages, loading state, and active conversation
   const showWelcome = !activeConversation && messages.length === 0 && !isLoadingMessages;
