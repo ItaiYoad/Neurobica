@@ -1,6 +1,6 @@
 import { useState } from "react";
 import NeurobicaLogoFull from "@assets/Neurobica logo full.png";
-import { Menu, User, LogOut, Settings, HelpCircle, Bell } from "lucide-react";
+import { Menu, User, LogOut, Settings, HelpCircle, Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
