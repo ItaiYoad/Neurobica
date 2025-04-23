@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { queryClient } from '@/lib/queryClient';
 
 export interface Conversation {
   id: string;
@@ -16,6 +15,7 @@ export interface Conversation {
 
 export function useConversations() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Fetch all conversations
   const {
@@ -72,29 +72,27 @@ export function useConversations() {
   });
 
   // Get messages for a conversation
-  const getMessages = async (conversationId: string) => {
+  const getMessages = useCallback(async (conversationId: string) => {
     const response = await apiRequest('GET', `/api/conversations/${conversationId}/messages`);
     return await response.json();
-  };
+  }, []);
 
-  // Set active conversation and return its data
-  const setActiveConversation = (id: string | null) => {
-    // Prevent unnecessary re-renders
+  // Set active conversation
+  const setActiveConversation = useCallback((id: string | null) => {
     if (id !== activeConversationId) {
       setActiveConversationId(id);
       
+      // Invalidate and refetch messages if we're switching to a different conversation
       if (id) {
-        return conversations.find(c => c.id === id) || null;
+        queryClient.invalidateQueries({
+          queryKey: ['conversationMessages', id]
+        });
       }
     }
-    
-    return null;
-  };
+  }, [activeConversationId, queryClient]);
 
-  // Get the active conversation
-  const activeConversation = activeConversationId
-    ? conversations.find(c => c.id === activeConversationId) || null
-    : null;
+  // Find active conversation in the list
+  const activeConversation = conversations.find(c => c.id === activeConversationId) || null;
 
   return {
     conversations,
