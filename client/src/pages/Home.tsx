@@ -24,13 +24,8 @@ export default function Home() {
           <div className="flex-1">
             <ChatInterface />
           </div>
-          <div className="hidden md:block w-80">
-            <SidePanel />
-          </div>
-        </main>
-        <div className="md:hidden">
           <SidePanel />
-        </div>
+        </main>
       </div>
     </div>
   );
