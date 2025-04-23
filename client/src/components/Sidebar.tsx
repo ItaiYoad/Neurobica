@@ -92,23 +92,23 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <Button
           variant="outline"
           size="icon"
-          className="absolute right-[25px]"
+          className="absolute right-[25px] h-8 w-8"
           onClick={() => {
             /* Your new chat logic */
           }}
         >
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-3.5 w-3.5" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleMinimize}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 rounded-full border shadow-sm bg-white z-10"
+          className="absolute -right-4 top-1/2 -translate-y-1/2 rounded-full border shadow-sm bg-white z-10 h-8 w-8"
         >
           {minimized ? (
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5" />
           ) : (
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3.5 w-3.5" />
           )}
         </Button>
       </div>
