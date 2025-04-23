@@ -47,7 +47,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       <div
         ref={sidebarRef}
-        className={`fixed top-16 left-0 h-screen p-2 flex flex-col gap-2 border-r bg-white ${isOpen ? '' : 'transform -translate-x-full'}`}
+        className={`fixed top-16 left-0 h-screen p-2 flex flex-col gap-2 border-r bg-white z-50 ${isOpen ? '' : 'transform -translate-x-full'}`}
       >
         <Button
           variant="ghost"
