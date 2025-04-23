@@ -1,3 +1,4 @@
+
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
@@ -38,19 +39,16 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
               </Button>
             ))}
           </div>
+          <div className="fixed bottom-0 left-0 right-0 w-full max-w-3xl mx-auto px-4 pb-4 bg-white">
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+            />
           </div>
-        </div>
-        <div className="fixed bottom-0 left-0 right-0 w-full max-w-3xl mx-auto px-4 pb-4 bg-white">
-          <ChatInput
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading}
-          />
         </div>
       ) : (
         <>
           <div className="flex-1 overflow-y-auto">
-            {" "}
-            {/* Added overflow-y-auto */}
             <ChatMessages messages={messages} isLoading={isLoading} />
           </div>
           <div className="absolute bottom-0 left-0 right-0 bg-white">
