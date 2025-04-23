@@ -14,14 +14,10 @@ import { SystemLogs } from "@/components/logs/SystemLogs"; // Assuming this impo
 export function Header() {
   return (
     <>
-      <div className="fixed bottom-4 right-4 flex items-center gap-2">
-        <img src={NeurobicaLogoFull} alt="Neurobica" className="h-8 opacity-50" />
+      <div className="fixed top-4 right-4 flex items-center gap-2">
         <Button variant="ghost" size="icon" className="h-8 w-8">
           <HelpCircle className="h-5 w-5" />
         </Button>
-      </div>
-
-      <div className="fixed top-4 right-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-9 w-9">
