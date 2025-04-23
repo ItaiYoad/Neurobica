@@ -28,10 +28,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const onTouchEnd = useCallback(() => {
     if (!touchStart || !touchEnd) return;
     
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
+    const distance = touchEnd - touchStart;
+    const isRightSwipe = distance > minSwipeDistance;
+    const startedFromLeftHalf = touchStart < window.innerWidth / 2;
     
-    if (isLeftSwipe && isOpen) {
+    if (startedFromLeftHalf && !isOpen && isRightSwipe) {
+      setIsOpen(true);
+    } else if (isOpen && !isRightSwipe) {
       onClose();
     }
     

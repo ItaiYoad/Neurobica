@@ -19,16 +19,12 @@ export function SidePanel() {
   const minSwipeDistance = 50;
 
   const onTouchStart = (e: TouchEvent) => {
-    if (e.touches[0].clientX > window.innerWidth - 30) {
-      setTouchEnd(null);
-      setTouchStart(e.touches[0].clientX);
-    }
+    setTouchEnd(null);
+    setTouchStart(e.touches[0].clientX);
   };
 
   const onTouchMove = (e: TouchEvent) => {
-    if (touchStart) {
-      setTouchEnd(e.touches[0].clientX);
-    }
+    setTouchEnd(e.touches[0].clientX);
   };
 
   const onTouchEnd = useCallback(() => {
@@ -36,8 +32,9 @@ export function SidePanel() {
     
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
+    const startedFromRightHalf = touchStart > window.innerWidth / 2;
     
-    if (isLeftSwipe && !isOpen) {
+    if (isLeftSwipe && startedFromRightHalf && !isOpen) {
       setIsOpen(true);
     }
     
