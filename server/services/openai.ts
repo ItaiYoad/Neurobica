@@ -42,7 +42,7 @@ export async function chatHandler(
 
     // Call OpenAI
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4",
       messages: [
         { role: "system", content: SYSTEM_PROMPT + emotionalContext },
         { role: "user", content: message },
@@ -82,7 +82,7 @@ export async function chatHandler(
 export async function generateChatTitle(): Promise<string> {
   try {
     const resp = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
