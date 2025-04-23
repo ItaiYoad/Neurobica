@@ -6,9 +6,20 @@ import { useState } from "react";
 
 export default function Home() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [sidePanelOpen, setSidePanelOpen] = useState(false);
 
   const toggleMobileSidebar = () => {
+    if (!mobileSidebarOpen) {
+      setSidePanelOpen(false);
+    }
     setMobileSidebarOpen(!mobileSidebarOpen);
+  };
+
+  const toggleSidePanel = (isOpen: boolean) => {
+    if (isOpen) {
+      setMobileSidebarOpen(false);
+    }
+    setSidePanelOpen(isOpen);
   };
 
   return (
@@ -24,7 +35,7 @@ export default function Home() {
           <div className="flex-1">
             <ChatInterface />
           </div>
-          <SidePanel />
+          <SidePanel isOpen={sidePanelOpen} onOpenChange={toggleSidePanel} />
         </main>
       </div>
     </div>

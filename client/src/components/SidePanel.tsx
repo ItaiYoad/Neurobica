@@ -8,11 +8,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent } from "./ui/sheet";
 import { useState, useEffect, useCallback } from "react";
 
-export function SidePanel() {
+interface SidePanelProps {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+}
+
+export function SidePanel({ isOpen, onOpenChange }: SidePanelProps) {
   const { biometricData } = useBiometrics();
   const { memoryItems, addMemoryItem } = useLifeScheduler();
   const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
@@ -35,7 +39,7 @@ export function SidePanel() {
     const startedFromRightHalf = touchStart > window.innerWidth / 2;
     
     if (isLeftSwipe && startedFromRightHalf && !isOpen) {
-      setIsOpen(true);
+      onOpenChange(true);
     }
     
     setTouchStart(null);
@@ -86,7 +90,7 @@ export function SidePanel() {
 
   if (isMobile) {
     return (
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet open={isOpen} onOpenChange={onOpenChange}>
         <SheetContent side="right" className="w-[85vw] max-w-[400px] p-0">
           {content}
         </SheetContent>
