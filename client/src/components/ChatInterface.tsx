@@ -102,14 +102,18 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
         </div>
       ) : (
         <>
-          <div className="flex-1 overflow-hidden">
-            <ChatMessages messages={messages} isLoading={isLoading} />
+          <div className="flex-1 overflow-hidden flex justify-center">
+            <div className="w-full max-w-3xl px-4">
+              <ChatMessages messages={messages} isLoading={isLoading} />
+            </div>
           </div>
-          <div className="relative">
-            <ChatInput
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-            />
+          <div className="relative flex justify-center">
+            <div className="w-full max-w-3xl px-4">
+              <ChatInput
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading}
+              />
+            </div>
           </div>
         </>
       )}
