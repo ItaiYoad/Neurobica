@@ -1,4 +1,3 @@
-
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
@@ -23,6 +22,9 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
 
   return (
     <div className="flex-1 flex flex-col h-screen">
+      <div className="bg-gray-100 p-4"> {/* Added Header */}
+        <h1 className="text-2xl font-bold">Chat Interface</h1> {/* Example Header */}
+      </div> {/* End Added Header */}
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center p-4">
           <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
@@ -39,16 +41,18 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
               </Button>
             ))}
           </div>
-          <div className="w-full max-w-3xl mt-8">
+          <div className="w-full max-w-3xl mt-8 flex-grow"> {/* Added flex-grow */}
             <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
           </div>
         </div>
       ) : (
         <>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto"> {/* Added overflow-y-auto */}
             <ChatMessages messages={messages} isLoading={isLoading} />
           </div>
-          <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+          <div className="flex-grow"> {/* Added flex-grow */}
+            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+          </div>
         </>
       )}
     </div>

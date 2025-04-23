@@ -18,7 +18,7 @@ interface HeaderProps {
 
 export function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
   return (
-    <div className="sticky top-0 h-14 bg-white border-b flex items-center px-4 z-50">
+    <div className="fixed top-0 left-0 right-0 h-14 bg-white border-b flex items-center px-4 z-50">
       {!isSidebarOpen && (
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-9 w-9">
           <Menu className="h-5 w-5" />
