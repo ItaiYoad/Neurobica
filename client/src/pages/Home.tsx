@@ -14,7 +14,7 @@ export default function Home() {
 
   return (
     <div className="font-sans bg-neutral-lighter text-neutral-dark h-screen flex flex-col">
-      <Header toggleSidebar={toggleSidebar} showMenuButton={true} />
+      <Header toggleSidebar={toggleSidebar} showMenuButton={true} emotionalState={emotionalState} />
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
