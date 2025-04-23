@@ -72,7 +72,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
 
   return (
     <div className="bg-white p-4 border-t w-full">
-      <form className="flex items-end w-full" onSubmit={handleSubmit}>
+      <form className="flex items-end w-full max-w-none px-4" onSubmit={handleSubmit}>
         <div className="flex-1 relative">
           <div className="w-full bg-white border border-blue-100 rounded-full shadow-sm">
             <textarea 
