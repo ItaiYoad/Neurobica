@@ -30,13 +30,15 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   return (
     <div className="flex-1 flex flex-col h-screen relative">
       <div 
-        className="absolute top-4 left-4 bg-white/80 p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white"
+        className="absolute bottom-4 left-4 bg-white p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white/90"
         onClick={() => setShowBiometrics(true)}
       >
-        <BiometricChart data={biometricData} className="w-32 h-24" />
-        <div className="flex gap-2 mt-2 text-sm">
-          <div>HR: {biometricData.heartRate}</div>
-          <div>EEG: {biometricData.eegAlpha.toFixed(1)}</div>
+        <div className="flex items-center gap-4">
+          <BiometricChart data={biometricData} className="w-32 h-24" />
+          <div className="flex flex-col gap-2 text-sm">
+            <div className="text-red-500">HR: {biometricData.heartRate}</div>
+            <div className="text-green-500">EEG: {biometricData.eegAlpha.toFixed(1)}</div>
+          </div>
         </div>
       </div>
 
