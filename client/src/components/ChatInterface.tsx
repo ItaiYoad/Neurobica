@@ -126,7 +126,6 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
           </div>
         </div>
       </div>
-      )
     </div>
   );
 }
