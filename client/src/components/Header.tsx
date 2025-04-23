@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import NeurobicaLogoFull from "@assets/Neurobica logo full.png";
 
 interface HeaderProps {
@@ -28,7 +29,8 @@ export function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
         <img src={NeurobicaLogoFull} alt="Neurobica" className="h-6 ml-2 opacity-30" />
       </div>
       
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
+        <NotificationCenter />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-9 w-9">
