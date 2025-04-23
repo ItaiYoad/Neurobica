@@ -21,9 +21,9 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-screen">
+    <div className="flex-1 flex flex-col h-full relative">
       {messages.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-4">
+        <div className="flex-1 flex flex-col items-center pt-[25px]">
           <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
           <div className="flex flex-wrap justify-center gap-4 max-w-xl">
             {suggestions.map((suggestion, index) => (
@@ -54,9 +54,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
             {/* Added overflow-y-auto */}
             <ChatMessages messages={messages} isLoading={isLoading} />
           </div>
-          <div className="flex-grow">
-            {" "}
-            {/* Added flex-grow */}
+          <div className="absolute bottom-0 left-0 right-0 bg-white">
             <ChatInput
               onSendMessage={handleSendMessage}
               isLoading={isLoading}

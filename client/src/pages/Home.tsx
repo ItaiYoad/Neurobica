@@ -12,15 +12,21 @@ export default function Home() {
   };
 
   return (
-    <div className="font-sans bg-neutral-lighter text-neutral-dark h-screen flex flex-col pt-14">
-      <Header toggleSidebar={toggleMobileSidebar} isSidebarOpen={mobileSidebarOpen} />
+    <div className="font-sans bg-neutral-lighter text-neutral-dark h-screen flex flex-col">
+      <div className={`transition-all duration-300 ${mobileSidebarOpen ? 'ml-[260px]' : ''}`}>
+        <Header toggleSidebar={toggleMobileSidebar} isSidebarOpen={mobileSidebarOpen} />
+      </div>
 
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
 
         <main className={`flex-1 flex overflow-hidden transition-all duration-300 ${mobileSidebarOpen ? 'ml-[260px]' : ''}`}>
-          <ChatInterface />
-          <div className={`transition-all duration-300 ${mobileSidebarOpen ? 'w-56' : 'w-80'}`}>
+          <div className="flex-1 flex justify-center">
+            <div className="w-full max-w-3xl">
+              <ChatInterface />
+            </div>
+          </div>
+          <div className={`transition-all duration-300 ${mobileSidebarOpen ? 'w-[260px]' : 'w-80'}`}>
             <SidePanel />
           </div>
         </main>

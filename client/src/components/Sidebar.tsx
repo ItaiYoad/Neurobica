@@ -20,7 +20,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         z-50
       `}
     >
-      <div className="flex items-center gap-2 p-2 border-b">
+      <div className="flex items-center gap-2 h-14 px-4 border-b">
         <Button
           variant="ghost"
           size="icon"
