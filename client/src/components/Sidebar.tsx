@@ -92,8 +92,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <Button
           variant="outline"
           size="icon"
-          className="absolute right-[90px]"
-          onClick={() => {/* Your new chat logic */}}
+          className="absolute right-[25px]"
+          onClick={() => {
+            /* Your new chat logic */
+          }}
         >
           <PlusCircle className="h-4 w-4" />
         </Button>
