@@ -158,7 +158,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   return (
     <div 
       key={activeConversationId || 'new-chat'} 
-      className="flex flex-col h-full w-full relative pt-14"
+      className="flex flex-col h-full w-full relative pt-14 overflow-y-auto"
     >
       {/* Debug info */}
       <div className="hidden">
@@ -181,7 +181,9 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
         
         {showWelcome && (
           <div className="flex-1 flex flex-col items-center pt-16 mt-4 max-w-3xl mx-auto px-4">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-violet-600 text-transparent bg-clip-text">Welcome to Neurobica</h1>
+            <h1 className="mb-2">
+              <img src="/attached_assets/Neurobica logo full.png" alt="Welcome to Neurobica" className="h-12 mx-auto" />
+            </h1>
             <p className="text-gray-600 mb-10 text-center">
               Your emotionally adaptive AI companion that responds to your biometric data in real-time.
             </p>
