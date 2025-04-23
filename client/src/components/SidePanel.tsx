@@ -5,7 +5,7 @@ import { LifeScheduler } from "./scheduler/LifeScheduler";
 import { useBiometrics } from "@/context/BiometricsContext";
 import { useLifeScheduler } from "@/hooks/useLifeScheduler";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
+import { Sheet, SheetContent } from "./ui/sheet";
 import { useState, useEffect, useCallback } from "react";
 
 export function SidePanel() {
@@ -19,21 +19,25 @@ export function SidePanel() {
   const minSwipeDistance = 50;
 
   const onTouchStart = (e: TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.touches[0].clientX);
+    if (e.touches[0].clientX > window.innerWidth - 30) {
+      setTouchEnd(null);
+      setTouchStart(e.touches[0].clientX);
+    }
   };
 
   const onTouchMove = (e: TouchEvent) => {
-    setTouchEnd(e.touches[0].clientX);
+    if (touchStart) {
+      setTouchEnd(e.touches[0].clientX);
+    }
   };
 
   const onTouchEnd = useCallback(() => {
     if (!touchStart || !touchEnd) return;
     
-    const distance = touchEnd - touchStart;
-    const isRightSwipe = distance > minSwipeDistance;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
     
-    if (isRightSwipe && !isOpen) {
+    if (isLeftSwipe && !isOpen) {
       setIsOpen(true);
     }
     
@@ -85,11 +89,11 @@ export function SidePanel() {
 
   if (isMobile) {
     return (
-      <Drawer open={isOpen} onOpenChange={setIsOpen}>
-        <DrawerContent side="right" className="w-[85vw] max-w-[400px] h-full p-0">
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetContent side="right" className="w-[85vw] max-w-[400px] p-0">
           {content}
-        </DrawerContent>
-      </Drawer>
+        </SheetContent>
+      </Sheet>
     );
   }
 
