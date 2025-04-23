@@ -1,7 +1,8 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
-import { Mic, Send, MoreHorizontal, Loader2 } from "lucide-react";
+import { Plus, Send } from "lucide-react";
 import AudioRecorder from "@/components/ui/audio-recorder";
-import { toast } from "@/hooks/use-toast";
 import { useAudio } from "@/context/AudioContext";
 
 interface ChatInputProps {
@@ -14,125 +15,88 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { settings } = useAudio();
 
-  // Auto-resize textarea as content grows
+  // Auto-grow textarea
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    const ta = textareaRef.current;
+    if (ta) {
+      ta.style.height = "auto";
+      ta.style.height = `${ta.scrollHeight}px`;
     }
   }, [message]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (message.trim() && !isLoading) {
-      onSendMessage(message);
-      setMessage("");
-      
-      // Reset height
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
-      }
-    }
+  const submit = () => {
+    const txt = message.trim();
+    if (!txt || isLoading) return;
+    onSendMessage(txt);
+    setMessage("");
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      submit();
     }
   };
 
-  const handleTranscription = (text: string) => {
-    if (text && text.trim()) {
-      // Set the transcribed text in the input
-      setMessage(text);
-      
-      // Optional: Auto-submit the transcribed text
-      if (settings.sttEnabled && !isLoading) {
-        onSendMessage(text);
-        
-        // Reset the message state after submission
-        setTimeout(() => {
-          setMessage("");
-        }, 100);
-      }
-    }
-  };
-
-  const handleMicClick = () => {
-    if (!settings.sttEnabled) {
-      toast({
-        title: "Speech recognition disabled",
-        description: "Enable speech recognition in settings to use this feature.",
-        variant: "destructive",
-      });
-    }
-  };
+  // Dynamically pick a radius class
+  const lineCount = message.split("\n").length;
+  const radiusClass = (() => {
+    if (lineCount === 1) return "rounded-full";
+    if (lineCount === 2) return "rounded-3xl";
+    if (lineCount === 3) return "rounded-2xl";
+    if (lineCount === 4) return "rounded-2xl";
+    if (lineCount === 5) return "rounded-xl";
+    if (lineCount === 6) return "rounded-xl";
+    return "rounded-lg";
+  })();
 
   return (
-    <div className="bg-white p-4 border-t w-full">
-      <form className="flex items-end w-full max-w-none px-4" onSubmit={handleSubmit}>
-        <div className="flex-1 relative">
-          <div className="w-full bg-white border border-blue-100 rounded-full shadow-sm">
-            <textarea 
-              ref={textareaRef}
-              className="w-full px-4 py-2 pr-32 focus:outline-none rounded-full resize-none overflow-hidden bg-transparent min-h-[40px] max-h-[120px]"
-              placeholder="Type your message..."
-              rows={1}
-              value={message}
-              onChange={(e) => {
-                setMessage(e.target.value);
-                if (textareaRef.current) {
-                  textareaRef.current.style.height = 'auto';
-                  textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    <div className="w-full px-4 bg-white pb-safe">
+      <div
+        className={`
+          flex items-center space-x-2
+          bg-white border border-gray-200
+          ${radiusClass}
+          px-4 py-2
+        `}
+      >
+        <Plus className="h-5 w-5 text-gray-400" />
+
+        <textarea
+          ref={textareaRef}
+          rows={1}
+          className="flex-1 bg-transparent resize-none overflow-hidden placeholder-gray-400 text-gray-900 focus:outline-none px-2 py-1"
+          placeholder="Type here…"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={onKeyDown}
+          disabled={isLoading}
+        />
+
+        <div className="relative w-8 h-8 flex-shrink-0">
+          {!message.trim() ? (
+            <AudioRecorder
+              onTranscription={(text) => {
+                const t = text.trim();
+                if (t && !isLoading) {
+                  onSendMessage(t);
+                  setTimeout(() => setMessage(""), 100);
                 }
               }}
-              onKeyDown={handleKeyDown}
-              disabled={isLoading}
+              className="absolute inset-0 text-gray-500"
             />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
-              <button 
-                type="button"
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
-                onClick={() => toast({
-                  title: "Menu",
-                  description: "Menu options will be available in a future update."
-                })}
-              >
-                <MoreHorizontal className="h-5 w-5" />
-              </button>
-              
-              {settings.sttEnabled ? (
-                <AudioRecorder 
-                  onTranscription={handleTranscription}
-                  className="inline-flex" 
-                />
-              ) : (
-                <button 
-                  type="button"
-                  onClick={handleMicClick}
-                  className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
-                >
-                  <Mic className="h-5 w-5" />
-                </button>
-              )}
-              
-              <button 
-                type="submit" 
-                className={`p-2 border border-blue-100 rounded-full hover:bg-gray-50 ${isLoading || !message.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={isLoading || !message.trim()}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 text-blue-400 animate-spin" />
-                ) : (
-                  <Send className="h-5 w-5 text-blue-400" />
-                )}
-              </button>
-            </div>
-          </div>
+          ) : (
+            <button
+              type="button"
+              onClick={submit}
+              disabled={isLoading}
+              className="absolute inset-0 flex items-center justify-center text-blue-600 hover:bg-gray-100 rounded-full"
+            >
+              <Send className="h-5 w-5" />
+            </button>
+          )}
         </div>
-      </form>
+      </div>
     </div>
   );
 }

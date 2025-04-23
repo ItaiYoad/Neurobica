@@ -1,3 +1,5 @@
+"use client";
+
 import { Message } from "@/types";
 import chatAssistantLogo from "@assets/Chat assistant logo.png";
 import TextPlayer from "@/components/ui/text-player";
@@ -10,105 +12,77 @@ interface ChatMessageProps {
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const { settings } = useAudio();
-  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
-  
-  // Add a slight delay before showing the text player for assistant messages
-  // This prevents TTS from starting while messages are still being added/animated
+  const [showAudio, setShowAudio] = useState(false);
+
   useEffect(() => {
     if (message.role === "assistant" && settings.ttsEnabled) {
-      const timer = setTimeout(() => {
-        setShowAudioPlayer(true);
-      }, 500);
-      
+      const timer = setTimeout(() => setShowAudio(true), 500);
       return () => clearTimeout(timer);
     }
   }, [message.role, settings.ttsEnabled]);
-  
+
   if (message.role === "user") {
-    // User message
     return (
-      <div className="mb-4 flex justify-end">
-        <div className="bg-primary text-white rounded-lg p-3 shadow-sm max-w-3xl">
+      <div className="flex justify-end">
+        <div className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-3xl">
           <p className="text-sm">{message.content}</p>
         </div>
       </div>
     );
-  } else {
-    // AI message
-    return (
-      <div className="mb-4">
-        <div className="flex mb-2">
-          <div className="mr-2 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
-              <img
-                src={chatAssistantLogo}
-                alt="Assistant"
-                className="w-6 h-6 object-contain"
-              />
-            </div>
-          </div>
-          <div className="bg-blue-50 rounded-lg p-3 shadow-sm max-w-3xl">
-            <div className="text-sm space-y-2">
-              <div className="flex items-start">
-                <p className="flex-1">{message.content}</p>
-                {showAudioPlayer && (
-                  <TextPlayer 
-                    text={message.content} 
-                    autoPlay={settings.ttsEnabled}
-                    className="ml-2 mt-1 flex-shrink-0"
-                  />
-                )}
-              </div>
-
-              {message.emotionalContext && (
-                <div className="flex items-center text-[11px] text-neutral-mid mt-2">
-                  <i className="fas fa-heart-rate mr-1"></i>
-                  <span>
-                    {message.emotionalContext.includes("calm") ? (
-                      <>
-                        I'm currently detecting that you're in a{" "}
-                        <span className="text-blue-400">calm</span> state.
-                      </>
-                    ) : (
-                      message.emotionalContext
-                    )}
-                  </span>
-                </div>
-              )}
-
-              {message.memoryTrigger && (
-                <div
-                  className={`p-2 ${
-                    message.memoryTrigger.type === "reminder"
-                      ? "bg-secondary-light bg-opacity-10 border border-secondary-light"
-                      : "bg-accent-light bg-opacity-10 border border-accent-light"
-                  } rounded-md mt-2`}
-                >
-                  <div className="flex items-center">
-                    <i
-                      className={`${
-                        message.memoryTrigger.type === "reminder"
-                          ? "fas fa-calendar-check text-secondary"
-                          : "fas fa-brain text-accent"
-                      } mr-2`}
-                    ></i>
-                    <div className="text-sm">
-                      <span className="font-medium">
-                        {message.memoryTrigger.type === "reminder"
-                          ? "Added to Life Scheduler:"
-                          : "Added to memory:"}
-                      </span>
-                      <span className="ml-1 text-neutral-dark">
-                        {message.memoryTrigger.content}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   }
+
+  return (
+    <div>
+      <div className="w-8 h-8 flex-shrink-0 rounded-full overflow-hidden"></div>
+      <div className="bg-blue-50 p-3 rounded-lg shadow-sm max-w-3xl space-y-2">
+        <p className="text-sm">{message.content}</p>
+        {showAudio && (
+          <TextPlayer
+            text={message.content}
+            autoPlay={settings.ttsEnabled}
+            className="mt-1"
+          />
+        )}
+        {message.emotionalContext && (
+          <div className="text-xs text-neutral-mid">
+            {message.emotionalContext.includes("calm") ? (
+              <>
+                I'm currently detecting that you're in a{" "}
+                <span className="text-blue-400">calm</span> state.
+              </>
+            ) : (
+              message.emotionalContext
+            )}
+          </div>
+        )}
+        {message.memoryTrigger && (
+          <div
+            className={`p-2 rounded-md border ${
+              message.memoryTrigger.type === "reminder"
+                ? "bg-secondary-light border-secondary-light"
+                : "bg-accent-light border-accent-light"
+            }`}
+          >
+            <div className="flex items-center space-x-2 text-sm">
+              <i
+                className={`fas ${
+                  message.memoryTrigger.type === "reminder"
+                    ? "fa-calendar-check text-secondary"
+                    : "fa-brain text-accent"
+                }`}
+              />
+              <span>
+                <span className="font-medium">
+                  {message.memoryTrigger.type === "reminder"
+                    ? "Added to Life Scheduler:"
+                    : "Added to memory:"}
+                </span>{" "}
+                {message.memoryTrigger.content}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
