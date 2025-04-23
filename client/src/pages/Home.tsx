@@ -48,9 +48,11 @@ export default function Home() {
       <Header toggleSidebar={toggleMobileSidebar} />
 
       <div className="flex flex-1 overflow-hidden">
-        <div className={`flex-none transition-transform duration-300 ${!mobileSidebarOpen ? '-translate-x-full' : ''}`}>
-          <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
-        </div>
+        {mobileSidebarOpen && (
+          <div className="flex-none">
+            <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
+          </div>
+        )}
         <main className="flex-1 flex overflow-hidden">
           <ChatInterface toggleSidebar={toggleMobileSidebar} />
           <SidePanel />
