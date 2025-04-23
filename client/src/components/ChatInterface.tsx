@@ -28,7 +28,42 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
 
   return (
     <div className="flex-1 flex flex-col h-screen">
-      
+      <div className="flex-1 flex flex-col h-full relative">
+        {messages.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center px-4 max-w-3xl mx-auto w-full">
+            <h1 className="text-4xl font-bold mb-8 text-center">What are you working on?</h1>
+            <div className="w-full">
+              <div className="flex flex-col gap-4">
+                <div className="relative">
+                  <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+                </div>
+                <div className="flex justify-center gap-2 mt-2">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Search className="w-4 h-4" />
+                    Search
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Wand2 className="w-4 h-4" />
+                    Deep research
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full pb-32">
+              <ChatMessages messages={messages} isLoading={isLoading} />
+            </div>
+          </div>
+        )}
+        <div className="absolute bottom-0 left-0 right-0 bg-white">
+          <div className="max-w-3xl mx-auto px-4 py-4">
+            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+          </div>
+        </div>
+      </div>
+
       <div className="absolute bottom-32 left-4 bg-white/60 p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white/80 transition-all duration-300 z-10">
         <div className="grid grid-cols-2 gap-2">
           <div className="p-1 border rounded-lg">
