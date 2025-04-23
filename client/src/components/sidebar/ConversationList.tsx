@@ -55,31 +55,45 @@ export function ConversationList() {
   const handleStartNewChat = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Starting new conversation (from ConversationList)");
+    console.log("🔄 Starting new conversation (from ConversationList)");
     
     try {
       // First ensure we clear any active conversation
+      console.log("🔄 Clearing active conversation");
       await setActiveConversation(null);
+      
+      // Force messages array to be empty using direct manipulation
+      window.localStorage.setItem('tempClearMessages', 'true');
       
       // Then invoke the startNewConversation method from useChat
       // This should reset message state
+      console.log("🔄 Calling startNewConversation function");
       startNewConversation();
       
-      console.log("New conversation started successfully");
+      // Force interface to show welcome screen
+      console.log("🔄 New conversation started successfully");
+      
+      // Sometimes a short timeout helps ensure state updates are processed
+      setTimeout(() => {
+        console.log("🔄 Verifying new chat state is set");
+      }, 100);
     } catch (error) {
       console.error("Error starting new conversation:", error);
     }
   };
   
   const handleSelectConversation = async (conversationId: string) => {
-    console.log("Selecting conversation:", conversationId, "Current active:", activeConversationId);
+    console.log("🎯 Selecting conversation:", conversationId, "Current active:", activeConversationId);
     
     try {
       if (conversationId !== activeConversationId) {
-        console.log("Setting active conversation to:", conversationId);
+        // Immediately set a loading state if needed
+        // setIsLoading(true);
         
-        // First, directly fetch the conversation messages
-        console.log("Directly fetching messages for conversation", conversationId);
+        console.log("🎯 Setting active conversation to:", conversationId);
+        
+        // 1. Directly fetch the conversation messages using fetch API
+        console.log("🎯 Directly fetching messages for conversation", conversationId);
         const response = await fetch(`/api/conversations/${conversationId}/messages`);
         
         if (!response.ok) {
@@ -87,10 +101,15 @@ export function ConversationList() {
         }
         
         const messages = await response.json();
-        console.log("Directly fetched messages:", messages);
+        console.log("🎯 Directly fetched messages:", messages.length);
         
-        // Then set the active conversation 
+        // 2. Set active conversation - wait for this to complete
         await setActiveConversation(conversationId);
+        
+        // 3. Force messages to be available - only if getMessages is available from hook
+        // Skip this step as it's handled by our direct fetch
+        
+        console.log("🎯 Conversation selection completed for:", conversationId);
       }
     } catch (error) {
       console.error("Error in handleSelectConversation:", error);

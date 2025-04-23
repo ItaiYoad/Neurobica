@@ -11,6 +11,9 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
+  // Using key with conversation ID to force a complete re-render when switching conversations
+  console.log("🔄 ChatInterface Component Rendering");
+  
   const { 
     messages, 
     sendMessage, 
@@ -18,7 +21,8 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
     isLoadingMessages, 
     startNewConversation,
     activeConversation,
-    activeConversationId
+    activeConversationId,
+    refetchMessages
   } = useChat();
 
   const handleSendMessage = useCallback((content: string) => {
@@ -76,8 +80,19 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   const showMessages = messages.length > 0 || (activeConversation !== null);
   const showLoading = isLoadingMessages;
 
+  // Use activeConversationId as a key to force re-rendering when it changes
   return (
-    <div className="flex flex-col h-full w-full relative pt-14">
+    <div 
+      key={activeConversationId || 'new-chat'} 
+      className="flex flex-col h-full w-full relative pt-14"
+    >
+      {/* Debug info */}
+      <div className="hidden">
+        Active conversation: {activeConversationId || 'none'}, 
+        Messages: {messages.length}, 
+        IsLoading: {isLoading ? 'true' : 'false'}
+      </div>
+      
       <div className="flex-1 overflow-hidden flex flex-col">
         {showLoading && (
           <div className="flex-1 flex flex-col items-center justify-center">
