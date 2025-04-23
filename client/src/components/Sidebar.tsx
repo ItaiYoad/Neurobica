@@ -64,29 +64,32 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
   }, [onTouchEnd, isOpen]);
 
   return (
-    <aside
-      className={`
-        fixed top-0 left-0 h-screen w-[290px] bg-white border-r border-gray-200
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        z-50
-      `}
-    >
-      <div className="flex items-center gap-2 h-14 px-4 border-b">
-        <Button
-          variant="ghost"
-          size="icon"
+    <>
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
           onClick={onClose}
-          className="h-9 w-9"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
+        />
+      )}
+      <aside
+        className={`
+          fixed top-0 left-0 h-screen w-[290px] bg-white border-r border-gray-200
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          z-50
+        `}
+      >
+        <div className="flex items-center gap-2 h-14 px-4 border-b">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="h-9 w-9"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
 
-        <div className="ml-2 font-semibold text-lg">
-          Neurobica
-        </div>
-
-        <Button
+          <Button
           variant="ghost"
           size="icon"
           className="h-9 w-9 ml-auto"
