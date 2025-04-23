@@ -21,7 +21,7 @@ export function Header({ toggleSidebar, showMenuButton }: HeaderProps) {
     <div className="flex items-center justify-between px-4 py-2 bg-white border-b">
       <div className="flex items-center gap-2">
         {showMenuButton && (
-          <button 
+          <button
             onClick={toggleSidebar}
             className="p-2 rounded-lg hover:bg-gray-50"
           >
@@ -54,6 +54,6 @@ export function Header({ toggleSidebar, showMenuButton }: HeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </>
+    </div>
   );
 }

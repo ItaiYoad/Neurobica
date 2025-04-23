@@ -33,8 +33,8 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
           <h1 className="text-lg font-medium">Neurobica AI</h1>
         </div>
         <div className="flex items-center gap-2">
-          <button 
-            onClick={() => setShowBiometrics(true)} 
+          <button
+            onClick={() => setShowBiometrics(true)}
             className="p-2 hover:bg-gray-100 rounded-full"
           >
             <i className="fas fa-chart-line"></i>
@@ -63,7 +63,6 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
           </div>
         </div>
       </div>
-
       <Dialog open={showBiometrics} onOpenChange={setShowBiometrics}>
         <DialogContent>
           <DialogHeader>
@@ -127,7 +126,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
           </div>
         </div>
       </div>
-      )}
+      )
     </div>
   );
 }
