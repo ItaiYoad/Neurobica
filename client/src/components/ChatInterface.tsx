@@ -30,17 +30,17 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   return (
     <div className="flex-1 flex flex-col h-screen relative">
       <div 
-        className={`absolute ${messages.length > 0 ? 'bottom-32' : 'bottom-4'} left-4 bg-white/60 p-4 rounded-lg shadow-sm cursor-pointer hover:bg-white/80 transition-all duration-300`}
+        className={`absolute ${messages.length > 0 ? 'bottom-32' : 'bottom-4'} left-4 bg-white/60 p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white/80 transition-all duration-300`}
         onClick={() => setShowBiometrics(true)}
       >
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-2 border rounded-lg">
-            <div className="text-sm text-gray-500">Heart Rate</div>
-            <div className="text-2xl font-semibold text-red-500">{biometricData.heartRate} bpm</div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="p-1 border rounded-lg">
+            <div className="text-xs text-gray-500">Heart Rate</div>
+            <div className="text-lg font-semibold text-red-500">{biometricData.heartRate} bpm</div>
           </div>
-          <div className="p-2 border rounded-lg">
-            <div className="text-sm text-gray-500">EEG Alpha</div>
-            <div className="text-2xl font-semibold text-green-500">{biometricData.eegAlpha.toFixed(1)} μV</div>
+          <div className="p-1 border rounded-lg">
+            <div className="text-xs text-gray-500">EEG Alpha</div>
+            <div className="text-lg font-semibold text-green-500">{biometricData.eegAlpha.toFixed(1)} μV</div>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
             <img 
               src="/Neurobica logo full.png"
               alt="Neurobica"
-              className="absolute right-4 bottom-20 h-6 opacity-50"
+              className="absolute right-4 bottom-16 h-6 opacity-50"
             />
             <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
           </div>
