@@ -27,11 +27,27 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-screen relative">
-      <div
-        className={`absolute ${messages.length > 0 ? "bottom-32" : "bottom-4"} left-4 bg-white/60 p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white/80 transition-all duration-300`}
-        onClick={() => setShowBiometrics(true)}
-      >
+    <div className="flex-1 flex flex-col h-screen">
+      <div className="flex items-center justify-between border-b px-4 py-2 bg-white">
+        <div className="flex items-center gap-2">
+          <h1 className="text-lg font-medium">Neurobica AI</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setShowBiometrics(true)} 
+            className="p-2 hover:bg-gray-100 rounded-full"
+          >
+            <i className="fas fa-chart-line"></i>
+          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-full">
+            <i className="fas fa-question"></i>
+          </button>
+          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+            N
+          </div>
+        </div>
+      </div>
+      <div className="absolute bottom-32 left-4 bg-white/60 p-2 rounded-lg shadow-sm cursor-pointer hover:bg-white/80 transition-all duration-300 z-10">
         <div className="grid grid-cols-2 gap-2">
           <div className="p-1 border rounded-lg">
             <div className="text-xs text-gray-500">Heart Rate</div>
@@ -102,8 +118,8 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
         </div>
       ) : (
         <>
-          <div className="flex-1 overflow-hidden flex justify-center">
-            <div className="w-full max-w-3xl px-4">
+          <div className="flex-1 overflow-hidden flex justify-center bg-white">
+            <div className="w-full max-w-3xl px-4 py-4">
               <ChatMessages messages={messages} isLoading={isLoading} />
             </div>
           </div>
