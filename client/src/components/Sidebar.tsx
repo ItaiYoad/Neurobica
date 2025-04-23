@@ -5,6 +5,7 @@ import { Menu, PlusCircle, Search } from "lucide-react";
 import { LifeScheduler } from "./scheduler/LifeScheduler";
 import { useBiometrics } from "@/context/BiometricsContext";
 import { useSystemLogs } from "@/hooks/useSystemLogs";
+import { useLifeScheduler } from "@/hooks/useLifeScheduler";
 
 interface SidebarProps {
   isOpen: boolean;

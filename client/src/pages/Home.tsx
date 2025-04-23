@@ -3,6 +3,7 @@ import { Menu } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
+import { BiometricChart } from "@/components/biometrics/BiometricChart";
 
 export default function Home() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
