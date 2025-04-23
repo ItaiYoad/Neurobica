@@ -91,30 +91,3 @@ export async function chatHandler(
     };
   }
 }
-
-
-
-/**
- * Generate a title for a conversation based on the first message
- */
-export async function generateTitle(message: string): Promise<string> {
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { 
-          role: "system", 
-          content: "Generate a brief, contextual title (3-5 words) for a conversation that starts with this message. The title should capture the main topic or intent." 
-        },
-        { role: "user", content: message }
-      ],
-      temperature: 0.7,
-      max_tokens: 50
-    });
-    
-    return response.choices[0].message.content?.trim() || "New Conversation";
-  } catch (error) {
-    console.error("Error generating title:", error);
-    return "New Conversation";
-  }
-}
