@@ -88,7 +88,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
       )}
 
-      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-end relative">
+      <div className="flex-none py-8 px-4 border-b border-gray-200 flex items-center justify-end relative">
         <Button
           variant="outline"
           size="icon"
