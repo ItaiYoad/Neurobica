@@ -6,20 +6,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ChatMessagesProps {
   messages: Message[];
-  notifications: Notification[];
   isLoading: boolean;
 }
 
-export function ChatMessages({ messages, notifications, isLoading }: ChatMessagesProps) {
+export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, notifications]);
-
-  // Merge messages and notifications chronologically
-  const chatItems = [...messages, ...notifications].sort((a, b) => a.timestamp - b.timestamp);
+  }, [messages]);
 
   return (
     <ScrollArea className="flex-1 bg-gray-50 h-full">
