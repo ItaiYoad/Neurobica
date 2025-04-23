@@ -93,45 +93,40 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
         alt="Neurobica"
         className="fixed right-4 bottom-4 h-5 opacity-30 z-10 pointer-events-none"
       />
-      {messages.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-4">
-          <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
-          <div className="flex flex-wrap justify-center gap-4 max-w-xl">
-            {suggestions.map((suggestion, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                className="h-12 px-6 flex items-center gap-2"
-                onClick={() => handleSendMessage(suggestion.text)}
-              >
-                <suggestion.icon className="h-5 w-5" />
-                {suggestion.text}
-              </Button>
-            ))}
+      <div className="flex-1 flex flex-col h-full relative">
+        {messages.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-4">
+            <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
+            <div className="flex flex-wrap justify-center gap-4 max-w-xl">
+              {suggestions.map((suggestion, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  className="h-12 px-6 flex items-center gap-2"
+                  onClick={() => handleSendMessage(suggestion.text)}
+                >
+                  <suggestion.icon className="h-5 w-5" />
+                  {suggestion.text}
+                </Button>
+              ))}
+            </div>
           </div>
-          <div className="w-full max-w-3xl mt-8">
+        ) : (
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full pb-32">
+              <ChatMessages messages={messages} isLoading={isLoading} />
+            </div>
+          </div>
+        )}
+        <div className="absolute bottom-0 left-0 right-0 bg-white">
+          <div className="max-w-3xl mx-auto px-4 py-4">
             <ChatInput
               onSendMessage={handleSendMessage}
               isLoading={isLoading}
             />
           </div>
         </div>
-      ) : (
-        <>
-          <div className="flex-1 overflow-hidden flex justify-center">
-            <div className="w-full max-w-3xl px-4">
-              <ChatMessages messages={messages} isLoading={isLoading} />
-            </div>
-          </div>
-          <div className="relative flex justify-center">
-            <div className="w-full max-w-3xl px-4">
-              <ChatInput
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-              />
-            </div>
-          </div>
-        </>
+      </div>
       )}
     </div>
   );

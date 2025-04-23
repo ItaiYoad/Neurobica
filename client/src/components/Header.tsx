@@ -11,10 +11,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SystemLogs } from "@/components/logs/SystemLogs"; // Assuming this import is correct
 
-export function Header() {
+interface HeaderProps {
+  toggleSidebar: () => void;
+  showMenuButton?: boolean;
+}
+
+export function Header({ toggleSidebar, showMenuButton }: HeaderProps) {
   return (
-    <>
-      <div className="fixed top-4 right-4 flex items-center gap-2">
+    <div className="flex items-center justify-between px-4 py-2 bg-white border-b">
+      <div className="flex items-center gap-2">
+        {showMenuButton && (
+          <button 
+            onClick={toggleSidebar}
+            className="p-2 rounded-lg hover:bg-gray-50"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        )}
+        <h1 className="text-lg font-medium">Neurobica AI</h1>
+      </div>
+      <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" className="h-8 w-8">
           <HelpCircle className="h-5 w-5" />
         </Button>
