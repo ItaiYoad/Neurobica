@@ -1,4 +1,3 @@
-
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
@@ -25,7 +24,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
     <div className="flex flex-col h-full w-full relative pt-14">
       <div className="flex-1 overflow-hidden flex flex-col">
         {messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center mt-6 max-w-3xl mx-auto px-4">
+          <div className="flex-1 flex flex-col items-center pt-20 mt-6 max-w-3xl mx-auto px-4">
             <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
             <div className="flex flex-wrap justify-center gap-4 max-w-xl">
               {suggestions.map((suggestion, index) => (
@@ -48,10 +47,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
         )}
       </div>
       <div className="w-full bg-white">
-        <ChatInput
-          onSendMessage={handleSendMessage}
-          isLoading={isLoading}
-        />
+        <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
       </div>
     </div>
   );
