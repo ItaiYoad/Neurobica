@@ -7,7 +7,7 @@ import { Search, Wand2 } from "lucide-react";
 import { useBiometrics } from "@/context/BiometricsContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { BiometricChart } from "./biometrics/BiometricChart";
-
+import NeurobicaLogo from "@assets/Neurobica logo full.png";
 interface ChatInterfaceProps {
   toggleSidebar: () => void;
 }
@@ -72,6 +72,11 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
           </div>
         </DialogContent>
       </Dialog>
+      <img
+        src={NeurobicaLogo}
+        alt="Neurobica"
+        className="fixed right-4 bottom-4 h-5 opacity-30 z-10 pointer-events-none"
+      />
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center p-4">
           <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
@@ -101,11 +106,6 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
             <ChatMessages messages={messages} isLoading={isLoading} />
           </div>
           <div className="relative">
-            <img
-              src="/attached_assets/Neurobica logo full.png"
-              alt="Neurobica"
-              className="fixed right-4 bottom-4 h-5 opacity-30 z-10 pointer-events-none"
-            />
             <ChatInput
               onSendMessage={handleSendMessage}
               isLoading={isLoading}
