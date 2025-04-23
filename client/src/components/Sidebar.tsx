@@ -69,11 +69,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <aside
       className={`
         relative flex flex-col
-        fixed z-50 top-16 h-[calc(100vh-4rem)]
-        ${isOpen ? "left-0" : "-left-full"}
+        ${isOpen ? "fixed z-50 top-16 left-0 h-[calc(100vh-4rem)]" : "hidden"} 
         ${minimized ? "w-16" : "w-64"} 
-        md:flex md:static md:z-auto md:h-full md:left-0
-        bg-white border-r border-gray-200 transition-all duration-300 ease-in-out
+        md:flex md:static md:z-auto md:h-full
+        bg-white border-r border-gray-200 transition-all duration-300
       `}
     >
       {isOpen && (
@@ -89,24 +88,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
       )}
 
-      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-between">
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <PlusCircle className="h-4 w-4" />
-        </Button>
-        {isOpen && (
+      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-end">
+        <div className="flex items-center">
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <PlusCircle className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={onClose}
-            className="md:hidden rounded-full"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hidden md:flex rounded-full"
             onClick={toggleMinimize}
             className="md:flex hidden rounded-full"
           >
@@ -117,7 +106,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             )}
           </Button>
         </div>
-      </aside>
+      </div>
 
       {/* Conversations section */}
       {!minimized && (

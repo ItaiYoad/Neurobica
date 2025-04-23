@@ -44,7 +44,15 @@ export function Header({ toggleSidebar }: HeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200 py-3 px-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center space-x-2">
-        
+        {/* Mobile sidebar toggle */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="md:hidden mr-2" 
+          onClick={toggleSidebar}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
         
         <div className="flex items-center">
           <img src={NeurobicaLogoFull} alt="Neurobica" className="h-8" />
