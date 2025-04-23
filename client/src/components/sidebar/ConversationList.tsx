@@ -52,18 +52,48 @@ export function ConversationList() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newTitle, setNewTitle] = useState("");
   
-  const handleStartNewChat = (e: React.MouseEvent) => {
+  const handleStartNewChat = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     console.log("Starting new conversation (from ConversationList)");
-    startNewConversation();
+    
+    try {
+      // First ensure we clear any active conversation
+      await setActiveConversation(null);
+      
+      // Then invoke the startNewConversation method from useChat
+      // This should reset message state
+      startNewConversation();
+      
+      console.log("New conversation started successfully");
+    } catch (error) {
+      console.error("Error starting new conversation:", error);
+    }
   };
   
-  const handleSelectConversation = (conversationId: string) => {
+  const handleSelectConversation = async (conversationId: string) => {
     console.log("Selecting conversation:", conversationId, "Current active:", activeConversationId);
-    if (conversationId !== activeConversationId) {
-      console.log("Setting active conversation to:", conversationId);
-      setActiveConversation(conversationId);
+    
+    try {
+      if (conversationId !== activeConversationId) {
+        console.log("Setting active conversation to:", conversationId);
+        
+        // First, directly fetch the conversation messages
+        console.log("Directly fetching messages for conversation", conversationId);
+        const response = await fetch(`/api/conversations/${conversationId}/messages`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch messages: ${response.status}`);
+        }
+        
+        const messages = await response.json();
+        console.log("Directly fetched messages:", messages);
+        
+        // Then set the active conversation 
+        await setActiveConversation(conversationId);
+      }
+    } catch (error) {
+      console.error("Error in handleSelectConversation:", error);
     }
   };
   

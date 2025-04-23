@@ -60,7 +60,10 @@ export function useChat() {
         return [];
       }
     },
-    enabled: !!activeConversationId
+    enabled: !!activeConversationId,
+    // Force refetch when conversation ID changes 
+    refetchOnMount: true,
+    refetchOnWindowFocus: false
   });
 
   // When conversation messages data changes, update our messages state
@@ -73,7 +76,8 @@ export function useChat() {
     
     if (activeConversationId && conversationMessages) {
       console.log("Setting messages for active conversation", activeConversationId);
-      setMessages(conversationMessages);
+      // Replace the messages completely, don't append
+      setMessages([...conversationMessages]);
     } else if (!activeConversationId) {
       console.log("No active conversation, clearing messages");
       setMessages([]);
@@ -134,8 +138,17 @@ export function useChat() {
   // Start a new conversation
   const startNewConversation = useCallback(() => {
     console.log("Starting new conversation");
+    
+    // Reset active conversation to null
     setActiveConversation(null);
+    
+    // Explicitly clear messages state
     setMessages([]);
+    
+    // Clear loading state
+    setIsLoading(false);
+    
+    console.log("New conversation state reset complete");
   }, [setActiveConversation]);
 
   // Send a message to the AI assistant

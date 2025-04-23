@@ -95,18 +95,32 @@ export function useConversations() {
   }, []);
 
   // Set active conversation - this is the key function for conversation selection
-  const setActiveConversation = useCallback((id: string | null) => {
+  const setActiveConversation = useCallback(async (id: string | null) => {
     console.log("Setting active conversation to:", id);
+    
+    // Set the active conversation ID immediately
     setActiveConversationId(id);
     
-    // Invalidate and refetch messages for the new conversation
+    // If there's a valid conversation ID, fetch its messages
     if (id) {
-      queryClient.invalidateQueries({
-        queryKey: ['conversationMessages', id]
-      });
-      
-      // Force refetch conversations to ensure UI updates
-      refetchConversations();
+      try {
+        console.log("⭐ Going to fetch messages for conversation", id);
+        
+        // Invalidate the query cache for this conversation's messages
+        queryClient.invalidateQueries({
+          queryKey: ['conversationMessages', id]
+        });
+        
+        // Force refetch conversations to ensure UI updates
+        await refetchConversations();
+        
+        // Log for debugging
+        console.log("⭐ Successfully set active conversation to:", id);
+      } catch (error) {
+        console.error("Error setting active conversation:", error);
+      }
+    } else {
+      console.log("⭐ Cleared active conversation");
     }
   }, [queryClient, refetchConversations]);
 
