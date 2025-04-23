@@ -35,7 +35,7 @@ export function BiometricChart({ data }: BiometricChartProps) {
   }, []);
 
   return (
-    <div className="h-40 bg-neutral-light rounded-lg flex items-center justify-center overflow-hidden">
+    <div className="h-32 sm:h-40 bg-neutral-light rounded-lg flex items-center justify-center overflow-hidden">
       {chartData.length > 0 ? (
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
