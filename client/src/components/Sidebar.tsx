@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { 
-  PanelLeft, 
-  Search, 
-  PlusCircle, 
+import {
+  PanelLeft,
+  PlusCircle,
   PanelRightClose,
-  Menu
+  Menu,
+  RotateCcw
 } from "lucide-react";
 
 interface SidebarProps {
@@ -33,16 +33,29 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { id: "9", title: "Neurotester", icon: "🔬" },
   ]);
 
-  if (!isOpen) {
-    return (
-      <div className="fixed top-16 left-0 h-screen p-2 flex flex-col gap-2 border-r bg-white">
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (sidebarRef.current) {
+      sidebarRef.current.style.transition = 'transform 0.3s ease-in-out';
+      sidebarRef.current.style.transform = isOpen ? 'translateX(0)' : 'translateX(-100%)';
+    }
+  }, [isOpen]);
+
+
+  return (
+    <>
+      <div
+        ref={sidebarRef}
+        className={`fixed top-16 left-0 h-screen p-2 flex flex-col gap-2 border-r bg-white ${isOpen ? '' : 'transform -translate-x-full'}`}
+      >
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
           className="h-8 w-8"
         >
-          <Menu className="h-4 w-4" />
+          <PanelRightClose className="h-4 w-4 transition-transform duration-300" style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(180deg)' }}/>
         </Button>
         <Button
           variant="ghost"
@@ -51,49 +64,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         >
           <PlusCircle className="h-4 w-4" />
         </Button>
+        {isOpen && (
+          <div className="flex-1 overflow-y-auto p-2">
+            {conversations.map((conversation) => (
+              <Link key={conversation.id} href={`/chat/${conversation.id}`}>
+                <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-3">
+                  <span className="text-lg">{conversation.icon}</span>
+                  <span className="text-sm truncate">{conversation.title}</span>
+                </button>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
-    );
-  }
-
-  return (
-    <aside className="h-[calc(100vh-4rem)] w-64 bg-white border-r flex flex-col">
-      <div className="p-2 flex items-center justify-between border-b">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-8 w-8"
-        >
-          <PanelRightClose className="h-4 w-4" />
-        </Button>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-          >
-            <PlusCircle className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-2">
-        {conversations.map((conversation) => (
-          <Link key={conversation.id} href={`/chat/${conversation.id}`}>
-            <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-3">
-              <span className="text-lg">{conversation.icon}</span>
-              <span className="text-sm truncate">{conversation.title}</span>
-            </button>
-          </Link>
-        ))}
-      </div>
-    </aside>
+    </>
   );
 }

@@ -55,13 +55,6 @@ export function Header({ toggleSidebar }: HeaderProps) {
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-        >
-          <Search className="h-5 w-5" />
-        </Button>
         <span className="text-xs bg-purple-400 text-white px-2 py-0.5 rounded-full">
           POC
         </span>
