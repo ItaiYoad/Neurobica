@@ -22,7 +22,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-full relative pt-14">
+    <div className="flex flex-col h-full w-full max-w-3xl mx-auto relative pt-14">
       <div className="flex-1 overflow-hidden flex flex-col">
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center mt-6">

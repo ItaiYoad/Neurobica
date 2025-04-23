@@ -20,11 +20,9 @@ export default function Home() {
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
 
-        <main className={`flex-1 flex overflow-hidden transition-all duration-300 ${mobileSidebarOpen ? 'ml-[260px]' : ''}`}>
-          <div className="flex-1 flex justify-center">
-            <div className="w-full max-w-3xl">
-              <ChatInterface />
-            </div>
+        <main className="flex-1 flex overflow-hidden">
+          <div className={`flex-1 transition-all duration-300 ${mobileSidebarOpen ? 'ml-[260px]' : ''}`}>
+            <ChatInterface />
           </div>
           <div className={`transition-all duration-300 ${mobileSidebarOpen ? 'w-[260px]' : 'w-80'}`}>
             <SidePanel />
