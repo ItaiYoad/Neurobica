@@ -36,8 +36,9 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
     const distance = touchEnd - touchStart;
     const isRightSwipe = distance > minSwipeDistance;
     const isLeftSwipe = distance < -minSwipeDistance;
+    const startedFromLeftEdge = touchStart < 30;
     
-    if (!isOpen && isRightSwipe) {
+    if (!isOpen && isRightSwipe && startedFromLeftEdge) {
       setIsOpen(true);
       onClose(); // This actually opens the sidebar in the parent component
     } else if (isOpen && isLeftSwipe) {
@@ -64,14 +65,21 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
   }, [onTouchEnd, isOpen]);
 
   return (
-    <aside
-      className={`
-        fixed top-0 left-0 h-screen w-[290px] bg-white border-r border-gray-200
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        z-50
-      `}
-    >
+    <>
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={onClose}
+        />
+      )}
+      <aside
+        className={`
+          fixed top-0 left-0 h-screen w-[290px] bg-white border-r border-gray-200
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          z-50
+        `}
+      >
       <div className="flex items-center gap-2 h-14 px-4 border-b">
         <Button
           variant="ghost"
@@ -99,5 +107,6 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
         <ConversationList />
       </div>
     </aside>
+    </>
   );
 }
