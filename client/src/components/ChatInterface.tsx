@@ -63,9 +63,9 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   ];
 
   // Determine what to show based on messages, loading state, and active conversation
-  const showWelcome = messages.length === 0 && !isLoadingMessages && !activeConversation;
-  const showTemplates = messages.length === 0 && !isLoadingMessages && !activeConversation;
-  const showMessages = messages.length > 0 || activeConversation;
+  const showWelcome = !activeConversation && messages.length === 0 && !isLoadingMessages;
+  const showTemplates = !activeConversation && messages.length === 0 && !isLoadingMessages;
+  const showMessages = messages.length > 0 || (activeConversation !== null);
   const showLoading = isLoadingMessages;
 
   return (

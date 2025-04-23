@@ -31,6 +31,7 @@ export type Message = {
   emotionalContext?: string;
   memoryTrigger?: MemoryItem;
   isVoiceMessage?: boolean;
+  conversationId?: string | null;
 };
 
 // Notification Types
