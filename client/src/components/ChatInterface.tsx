@@ -21,11 +21,11 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-full relative">
+    <div className="flex-1 flex flex-col h-full relative pt-14">
       {messages.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center pt-[25px]">
+        <div className="flex-1 flex flex-col items-center mt-6">
           <h1 className="text-4xl font-bold mb-8">What can I help with?</h1>
-          <div className="flex flex-wrap justify-center gap-4 max-w-xl">
+          <div className="flex flex-wrap justify-center gap-4 max-w-xl mb-20">
             {suggestions.map((suggestion, index) => (
               <Button
                 key={index}
@@ -38,14 +38,13 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
               </Button>
             ))}
           </div>
-          <div className="w-full max-w-3xl mt-8 flex-grow">
-            {" "}
-            {/* Added flex-grow */}
-            <ChatInput
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-            />
           </div>
+        </div>
+        <div className="fixed bottom-0 left-0 right-0 w-full max-w-3xl mx-auto px-4 pb-4 bg-white">
+          <ChatInput
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
+          />
         </div>
       ) : (
         <>
