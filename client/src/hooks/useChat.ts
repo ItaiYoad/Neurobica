@@ -98,9 +98,10 @@ export function useChat() {
 
   // Start a new conversation
   const startNewConversation = async () => {
-    // Create a new conversation and set it as active
+    // Clear current conversation and messages
     setActiveConversation(null);
     setMessages([]);
+    setIsLoadingMessages(false);
   };
 
   // Send a message to the AI assistant

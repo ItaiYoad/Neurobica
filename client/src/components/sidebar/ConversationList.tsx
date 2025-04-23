@@ -56,8 +56,9 @@ export function ConversationList() {
     startNewConversation();
   };
   
-  const handleSelectConversation = (conversationId: string) => {
+  const handleSelectConversation = async (conversationId: string) => {
     setActiveConversation(conversationId);
+    await getMessages(conversationId);
   };
   
   const handleRenameClick = (conversation: Conversation) => {

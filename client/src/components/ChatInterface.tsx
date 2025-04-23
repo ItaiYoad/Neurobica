@@ -64,7 +64,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
 
   // Determine what to show based on messages, loading state, and active conversation
   const showWelcome = !activeConversation && messages.length === 0 && !isLoadingMessages;
-  const showTemplates = !activeConversation && messages.length === 0 && !isLoadingMessages;
+  const showTemplates = !activeConversation && messages.length === 0 && !isLoadingMessages && !isLoading;
   const showMessages = messages.length > 0 || (activeConversation !== null);
   const showLoading = isLoadingMessages;
 
@@ -81,14 +81,14 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
             </div>
           </div>
         )}
-        
+
         {showWelcome && (
           <div className="flex-1 flex flex-col items-center pt-16 mt-4 max-w-3xl mx-auto px-4">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-violet-600 text-transparent bg-clip-text">Welcome to Neurobica</h1>
             <p className="text-gray-600 mb-10 text-center">
               Your emotionally adaptive AI companion that responds to your biometric data in real-time.
             </p>
-            
+
             {showTemplates && (
               <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-4">Start a conversation about:</h2>
@@ -113,7 +113,7 @@ export function ChatInterface({ toggleSidebar }: ChatInterfaceProps) {
             )}
           </div>
         )}
-        
+
         {showMessages && (
           <div className="flex-1 overflow-y-auto">
             <ChatMessages messages={messages} isLoading={isLoading} />
