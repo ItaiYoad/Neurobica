@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { WebSocketServer } from "ws";
@@ -8,6 +8,13 @@ import WebSocket from "ws";
 import { extractMemoriesFromText } from "./services/biometrics";
 import { nanoid } from "nanoid";
 import multer from 'multer';
+import { 
+  type InsertMessage, 
+  type InsertConversation, 
+  type InsertMemory, 
+  type InsertLog, 
+  type InsertBiometricData 
+} from "@shared/schema";
 import { speechToText, textToSpeech } from './services/openai-audio';
 
 // Configure multer for audio file uploads
@@ -24,14 +31,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup WebSocket handlers with async initialization
   await setupWebSocketHandlers(wss);
   
+  // CONVERSATIONS ENDPOINTS
+  
+  // Get all conversations
+  app.get("/api/conversations", async (req, res) => {
+    try {
+      const conversations = await storage.getAllConversations();
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create a new conversation
+  app.post("/api/conversations", async (req, res) => {
+    try {
+      const { title = "New Conversation", userId = null } = req.body;
+      
+      const conversation = await storage.createConversation({
+        id: nanoid(),
+        title,
+        userId,
+        summary: null,
+        emotionalTag: null,
+        lastMessageAt: null,
+        messageCount: 0
+      });
+      
+      res.status(201).json(conversation);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get a single conversation by ID
+  app.get("/api/conversations/:id", async (req, res) => {
+    try {
+      const conversation = await storage.getConversation(req.params.id);
+      
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      res.json(conversation);
+    } catch (error) {
+      console.error(`Error fetching conversation ${req.params.id}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update a conversation
+  app.patch("/api/conversations/:id", async (req, res) => {
+    try {
+      const { title, summary, emotionalTag } = req.body;
+      const updates: Partial<InsertConversation> = {};
+      
+      if (title !== undefined) updates.title = title;
+      if (summary !== undefined) updates.summary = summary;
+      if (emotionalTag !== undefined) updates.emotionalTag = emotionalTag;
+      
+      const conversation = await storage.updateConversation(req.params.id, updates);
+      
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      res.json(conversation);
+    } catch (error) {
+      console.error(`Error updating conversation ${req.params.id}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete a conversation
+  app.delete("/api/conversations/:id", async (req, res) => {
+    try {
+      const conversationExists = await storage.getConversation(req.params.id);
+      
+      if (!conversationExists) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      await storage.deleteConversation(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error(`Error deleting conversation ${req.params.id}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get messages for a conversation
+  app.get("/api/conversations/:id/messages", async (req, res) => {
+    try {
+      const conversationExists = await storage.getConversation(req.params.id);
+      
+      if (!conversationExists) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const messages = await storage.getMessagesByConversation(req.params.id, limit);
+      
+      res.json(messages);
+    } catch (error) {
+      console.error(`Error fetching messages for conversation ${req.params.id}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Chat endpoint
   app.post("/api/chat", async (req, res) => {
     try {
-      const { message, emotionalState } = req.body;
+      const { message, emotionalState, conversationId } = req.body;
       
       if (!message) {
         return res.status(400).json({ message: "Message is required" });
       }
+      
+      // Create or get conversation
+      let currentConversationId = conversationId;
+      if (!currentConversationId) {
+        // Create a new conversation if none provided
+        const newConversation = await storage.createConversation({
+          id: nanoid(),
+          title: "New Conversation", // Will be updated after first message
+          userId: null,
+          summary: null,
+          emotionalTag: emotionalState && emotionalState.label ? emotionalState.label : null,
+          lastMessageAt: new Date(),
+          messageCount: 0
+        });
+        currentConversationId = newConversation.id;
+      }
+      
+      // Store the user message
+      const userMessageId = nanoid();
+      await storage.createMessage({
+        id: userMessageId,
+        conversationId: currentConversationId,
+        role: "user",
+        content: message,
+        emotionalContext: emotionalState && emotionalState.label ? emotionalState.label : null,
+        memoryTriggerId: null
+      });
       
       // Log the chat message
       const logId = nanoid();
@@ -39,12 +183,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: logId,
         type: "message",
         message: `User message: ${message.substring(0, 50)}${message.length > 50 ? '...' : ''}`,
-        data: { message, emotionalState },
+        data: { message, emotionalState, conversationId: currentConversationId },
       });
       
       // Process chat in background
       chatHandler(message, emotionalState)
-        .then(response => {
+        .then(async response => {
           // Broadcast message to all clients
           const messageId = nanoid();
           
@@ -91,9 +235,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
           }
           
-          // Store the message
-          storage.createMessage({
+          // Store the assistant message
+          await storage.createMessage({
             id: messageId,
+            conversationId: currentConversationId,
             role: "assistant",
             content: response.message,
             emotionalContext: response.emotionalContext,
@@ -107,6 +252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 type: "chat_message",
                 data: {
                   id: messageId,
+                  conversationId: currentConversationId,
                   role: "assistant",
                   content: response.message,
                   emotionalContext: response.emotionalContext,
@@ -124,11 +270,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           // Log the response
-          storage.createLog({
+          await storage.createLog({
             id: nanoid(),
             type: "message",
             message: `Assistant response: ${response.message.substring(0, 50)}${response.message.length > 50 ? '...' : ''}`,
-            data: { message: response.message, emotionalContext: response.emotionalContext }
+            data: { message: response.message, emotionalContext: response.emotionalContext, conversationId: currentConversationId }
           });
           
         })
@@ -140,12 +286,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: nanoid(),
             type: "alert",
             message: `Chat processing error: ${error.message}`,
-            data: { error: error.message }
+            data: { error: error.message, conversationId: currentConversationId }
           });
         });
       
       // Acknowledge receipt immediately
-      res.json({ message: "Message received, processing" });
+      res.json({ message: "Message received, processing", conversationId: currentConversationId });
       
     } catch (error) {
       console.error("Chat error:", error);

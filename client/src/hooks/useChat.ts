@@ -3,31 +3,84 @@ import { Message, Notification, NotificationType, EmotionalState, MemoryItem } f
 import { nanoid } from "nanoid";
 import { useBiometrics } from "@/context/BiometricsContext";
 import { apiRequest } from "@/lib/queryClient";
+import { useConversations } from "./useConversations";
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const { currentEmotionalState, sendMessage: sendWebSocketMessage, lastMessage } = useBiometrics();
+  const { 
+    activeConversationId, 
+    activeConversation, 
+    setActiveConversation, 
+    createConversation,
+    getMessages
+  } = useConversations();
 
-  // Initialize with empty messages
+  // Clear messages when no active conversation
   useEffect(() => {
-    setMessages([]);
-  }, []);
+    if (activeConversationId === null) {
+      setMessages([]);
+    }
+  }, [activeConversationId]);
+
+  // Load messages when active conversation changes
+  useEffect(() => {
+    async function loadMessages() {
+      if (activeConversationId) {
+        setIsLoadingMessages(true);
+        try {
+          const conversationMessages = await getMessages(activeConversationId);
+          // Convert to the expected Message format
+          const formattedMessages = conversationMessages.map((msg: any) => ({
+            id: msg.id,
+            role: msg.role,
+            content: msg.content,
+            timestamp: new Date(msg.timestamp).getTime(),
+            emotionalContext: msg.emotionalContext,
+            memoryTriggerId: msg.memoryTriggerId,
+            conversationId: msg.conversationId
+          }));
+          setMessages(formattedMessages);
+        } catch (error) {
+          console.error("Error loading messages:", error);
+        } finally {
+          setIsLoadingMessages(false);
+        }
+      }
+    }
+
+    if (activeConversationId) {
+      loadMessages();
+    }
+  }, [activeConversationId, getMessages]);
 
   // Listen for incoming websocket messages (notifications, etc.)
   useEffect(() => {
     if (lastMessage) {
       switch (lastMessage.type) {
         case "chat_message":
-          if (lastMessage.data.role === "assistant" && !messages.some(msg => msg.content === lastMessage.data.content)) {
+          // Only add if it's for the current conversation or if we're starting a new one
+          if (lastMessage.data.role === "assistant" && 
+              (!activeConversationId || lastMessage.data.conversationId === activeConversationId) &&
+              !messages.some(msg => msg.content === lastMessage.data.content)) {
+            
+            // If we receive a message with a conversationId but we don't have an active conversation,
+            // set that as our active conversation
+            if (lastMessage.data.conversationId && !activeConversationId) {
+              setActiveConversation(lastMessage.data.conversationId);
+            }
+            
             setMessages(prev => [...prev, {
-              id: nanoid(),
+              id: lastMessage.data.id || nanoid(),
               role: lastMessage.data.role,
               content: lastMessage.data.content,
               timestamp: Date.now(),
               emotionalContext: lastMessage.data.emotionalContext,
-              memoryTrigger: lastMessage.data.memoryTrigger
+              memoryTrigger: lastMessage.data.memoryTrigger,
+              conversationId: lastMessage.data.conversationId
             }]);
             setIsLoading(false);
           }
@@ -41,7 +94,14 @@ export function useChat() {
           break;
       }
     }
-  }, [lastMessage]);
+  }, [lastMessage, activeConversationId, messages, setActiveConversation]);
+
+  // Start a new conversation
+  const startNewConversation = async () => {
+    // Create a new conversation and set it as active
+    setActiveConversation(null);
+    setMessages([]);
+  };
 
   // Send a message to the AI assistant
   const sendMessage = async (content: string) => {
@@ -52,7 +112,8 @@ export function useChat() {
       id: nanoid(),
       role: "user",
       content,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      conversationId: activeConversationId
     };
     
     setMessages(prev => [...prev, userMessage]);
@@ -62,19 +123,23 @@ export function useChat() {
       // Send to backend via API
       const response = await apiRequest("POST", "/api/chat", {
         message: content,
-        emotionalState: currentEmotionalState
+        emotionalState: currentEmotionalState,
+        conversationId: activeConversationId
       });
       
       const data = await response.json();
       
-      // The actual assistant response will come via WebSocket
-      // The immediate API response is just for acknowledgement
+      // If we didn't have an active conversation, set the new one as active
+      if (!activeConversationId && data.conversationId) {
+        setActiveConversation(data.conversationId);
+      }
       
       // Also send via WebSocket for logging
       sendWebSocketMessage("chat_message", {
         role: "user",
         content,
-        emotionalState: currentEmotionalState
+        emotionalState: currentEmotionalState,
+        conversationId: data.conversationId || activeConversationId
       });
       
     } catch (error) {
@@ -86,7 +151,8 @@ export function useChat() {
         id: nanoid(),
         role: "assistant",
         content: "Sorry, I couldn't process your message. Please try again.",
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        conversationId: activeConversationId
       }]);
     }
   };
@@ -95,7 +161,11 @@ export function useChat() {
     messages,
     notifications,
     sendMessage,
+    startNewConversation,
     isLoading,
-    emotionalState: currentEmotionalState
+    isLoadingMessages,
+    emotionalState: currentEmotionalState,
+    activeConversationId,
+    activeConversation
   };
 }
