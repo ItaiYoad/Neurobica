@@ -17,12 +17,16 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const minSwipeDistance = 50;
 
   const onTouchStart = (e: TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.touches[0].clientX);
+    if (e.touches[0].clientX < 30 || isOpen) {
+      setTouchEnd(null);
+      setTouchStart(e.touches[0].clientX);
+    }
   };
 
   const onTouchMove = (e: TouchEvent) => {
-    setTouchEnd(e.touches[0].clientX);
+    if (touchStart !== null) {
+      setTouchEnd(e.touches[0].clientX);
+    }
   };
 
   const onTouchEnd = useCallback(() => {
@@ -30,11 +34,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     
     const distance = touchEnd - touchStart;
     const isRightSwipe = distance > minSwipeDistance;
-    const startedFromLeftHalf = touchStart < window.innerWidth / 2;
+    const isLeftSwipe = distance < -minSwipeDistance;
+    const startedFromLeftEdge = touchStart < 30;
     
-    if (startedFromLeftHalf && !isOpen && isRightSwipe) {
+    if (startedFromLeftEdge && isRightSwipe && !isOpen) {
       setIsOpen(true);
-    } else if (isOpen && !isRightSwipe) {
+    } else if (isOpen && isLeftSwipe) {
       onClose();
     }
     
