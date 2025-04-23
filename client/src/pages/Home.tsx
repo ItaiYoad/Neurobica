@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Menu } from "lucide-react";
 import { Header } from "@/components/Header";
+import { useBiometrics } from "@/context/BiometricsContext";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { BiometricChart } from "@/components/biometrics/BiometricChart";
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { emotionalState } = useBiometrics();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
