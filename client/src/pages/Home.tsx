@@ -22,9 +22,6 @@ export default function Home() {
     setSidePanelOpen(isOpen);
   };
 
-  // Prevent interaction when other panel is open
-  const isAnyPanelOpen = mobileSidebarOpen || sidePanelOpen;
-
   return (
     <div className="font-sans bg-neutral-lighter text-neutral-dark h-screen flex flex-col">
       <div className={`transition-all duration-300 ${mobileSidebarOpen ? 'ml-[260px]' : ''}`}>

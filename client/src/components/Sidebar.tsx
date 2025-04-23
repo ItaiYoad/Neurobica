@@ -36,8 +36,9 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
     const distance = touchEnd - touchStart;
     const isRightSwipe = distance > minSwipeDistance;
     const isLeftSwipe = distance < -minSwipeDistance;
+    const startedFromLeftEdge = touchStart < 30;
     
-    if (!isOpen && isRightSwipe) {
+    if (!isOpen && isRightSwipe && startedFromLeftEdge) {
       setIsOpen(true);
       onClose(); // This actually opens the sidebar in the parent component
     } else if (isOpen && isLeftSwipe) {
@@ -67,7 +68,7 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
     <>
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+          className="fixed inset-0 bg-black/50 z-40"
           onClick={onClose}
         />
       )}
@@ -79,17 +80,21 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
           z-50
         `}
       >
-        <div className="flex items-center gap-2 h-14 px-4 border-b">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="h-9 w-9"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+      <div className="flex items-center gap-2 h-14 px-4 border-b">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-9 w-9"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
 
-          <Button
+        <div className="ml-2 font-semibold text-lg">
+          Neurobica
+        </div>
+
+        <Button
           variant="ghost"
           size="icon"
           className="h-9 w-9 ml-auto"
@@ -102,5 +107,6 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
         <ConversationList />
       </div>
     </aside>
+    </>
   );
 }
