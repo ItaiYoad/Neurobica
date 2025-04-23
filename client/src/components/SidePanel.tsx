@@ -47,7 +47,7 @@ export function SidePanel({ isOpen, onOpenChange }: SidePanelProps) {
   }, [touchStart, touchEnd, isOpen]);
 
   useEffect(() => {
-    if (isMobile) {
+    if (isMobile && !isOpen) {
       document.addEventListener('touchstart', onTouchStart);
       document.addEventListener('touchmove', onTouchMove);
       document.addEventListener('touchend', onTouchEnd);
@@ -58,7 +58,7 @@ export function SidePanel({ isOpen, onOpenChange }: SidePanelProps) {
         document.removeEventListener('touchend', onTouchEnd);
       };
     }
-  }, [isMobile, onTouchEnd]);
+  }, [isMobile, onTouchEnd, isOpen]);
 
   const content = (
     <ScrollArea className="h-full">

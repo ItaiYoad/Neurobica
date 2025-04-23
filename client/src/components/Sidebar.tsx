@@ -50,16 +50,18 @@ export function Sidebar({ isOpen: propIsOpen, onClose }: SidebarProps) {
   }, [touchStart, touchEnd, isOpen, onClose]);
 
   useEffect(() => {
-    document.addEventListener('touchstart', onTouchStart);
-    document.addEventListener('touchmove', onTouchMove);
-    document.addEventListener('touchend', onTouchEnd);
+    if (!isOpen) {
+      document.addEventListener('touchstart', onTouchStart);
+      document.addEventListener('touchmove', onTouchMove);
+      document.addEventListener('touchend', onTouchEnd);
 
-    return () => {
-      document.removeEventListener('touchstart', onTouchStart);
-      document.removeEventListener('touchmove', onTouchMove);
-      document.removeEventListener('touchend', onTouchEnd);
-    };
-  }, [onTouchEnd]);
+      return () => {
+        document.removeEventListener('touchstart', onTouchStart);
+        document.removeEventListener('touchmove', onTouchMove);
+        document.removeEventListener('touchend', onTouchEnd);
+      };
+    }
+  }, [onTouchEnd, isOpen]);
 
   return (
     <aside
