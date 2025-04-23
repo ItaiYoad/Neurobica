@@ -54,6 +54,8 @@ export function Header({ toggleSidebar, showMenuButton }: HeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    import { Menu } from "@/components/ui/menubar";
+
+</div>
   );
 }
