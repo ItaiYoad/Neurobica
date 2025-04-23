@@ -88,32 +88,27 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
       )}
 
-      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-between">
-        {!minimized && (
-          <div className="text-sm font-semibold text-primary">
-            Conversations
-          </div>
-        )}
-        <div className="flex items-center">
-          {!minimized && (
-            <Button variant="outline" size="sm" className="mr-2">
-              <PlusCircle className="h-4 w-4 mr-1" />
-              <span>New Chat</span>
-            </Button>
+      <div className="flex-none p-4 border-b border-gray-200 flex items-center justify-end relative">
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute right-[90px]"
+          onClick={() => {/* Your new chat logic */}}
+        >
+          <PlusCircle className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleMinimize}
+          className="absolute -right-6 top-1/2 -translate-y-1/2 rounded-full border shadow-sm bg-white z-10"
+        >
+          {minimized ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleMinimize}
-            className="md:flex hidden rounded-full"
-          >
-            {minimized ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
+        </Button>
       </div>
 
       {/* Conversations section */}
