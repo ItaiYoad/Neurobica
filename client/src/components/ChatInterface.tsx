@@ -118,13 +118,15 @@ export function ChatInterface() {
         )}
 
         {isNewChat && (
-          <div className="flex flex-col items-center px-4 pt-16 space-y-6 max-w-3xl mx-auto">
-            <img src={NeurobicaLogoFull} alt="Neurobica" className="h-10" />
-            <p className="text-center text-gray-600">
-              Your emotionally adaptive AI companion that responds to your
-              biometric data in real-time.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+          <div className="flex flex-col items-center max-w-3xl mx-auto">
+            <div className="fixed top-0 left-0 right-0 bg-white z-10 flex flex-col items-center pt-16 pb-6 px-4">
+              <img src={NeurobicaLogoFull} alt="Neurobica" className="h-10" />
+              <p className="text-center text-gray-600 mt-6">
+                Your emotionally adaptive AI companion that responds to your
+                biometric data in real-time.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-40 px-4">
               {INITIAL_SUGGESTIONS.map((s, i) => (
                 <button
                   key={i}
