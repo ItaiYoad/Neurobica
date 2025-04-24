@@ -126,7 +126,7 @@ export function ChatInterface() {
                 biometric data in real-time.
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 pt-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 pt-[21px]">
               {INITIAL_SUGGESTIONS.map((s, i) => (
                 <button
                   key={i}
