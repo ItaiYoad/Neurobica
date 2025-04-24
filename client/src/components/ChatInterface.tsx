@@ -126,7 +126,7 @@ export function ChatInterface() {
                 biometric data in real-time.
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 pt-[21px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 pt-[215px]">
               {INITIAL_SUGGESTIONS.map((s, i) => (
                 <button
                   key={i}
@@ -152,7 +152,7 @@ export function ChatInterface() {
       </div>
 
       {/* ─── Input Area (pinned) ────────────────────────── */}
-      <div className="border-t p-2 bg-white">
+      <div className=" p-2 bg-white">
         <ChatInput onSendMessage={handleSend} isLoading={isLoading} />
       </div>
     </div>
